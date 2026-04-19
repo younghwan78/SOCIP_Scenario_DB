@@ -45,6 +45,10 @@ htmlcov/
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
 *.ipynb_checkpoints
+# notebook 생성 이미지 (임시 export)
+demo/notebooks/*.png
+demo/notebooks/*.svg
+demo/notebooks/*.html
 
 # =============================================================================
 # IDE / Editor
