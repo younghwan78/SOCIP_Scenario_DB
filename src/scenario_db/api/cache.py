@@ -92,7 +92,35 @@ def variant_hash(
 def match_issues_for_variant(
     ctx: "MatcherContext",  # type: ignore[name-defined]
     issues: list[IssueResponse],
+    scenario_id: str | None = None,
 ) -> list[IssueResponse]:
-    """Issue.affects 룰과 variant context를 매칭. 현재 캐싱 없음."""
+    """
+    Issue.affects (list[{scenario_ref, match_rule}]) 를 variant context에 평가.
+
+    affects 구조:
+        [{"scenario_ref": "uc-camera-recording", "match_rule": {"all": [...], "any": [...]}}, ...]
+
+    scenario_id가 주어지면 scenario_ref 불일치 항목은 건너뜀 ("*" 와일드카드 허용).
+    """
     from scenario_db.matcher.runner import evaluate
-    return [iss for iss in issues if iss.affects and evaluate(iss.affects, ctx)]
+
+    matched = []
+    for iss in issues:
+        if not iss.affects:
+            continue
+        for affect in iss.affects:
+            if not isinstance(affect, dict):
+                continue
+            # scenario_ref 필터
+            ref = affect.get("scenario_ref", "*")
+            if scenario_id and ref != "*" and ref != scenario_id:
+                continue
+            match_rule = affect.get("match_rule")
+            if not match_rule:
+                # match_rule 없으면 해당 scenario_ref만으로 매칭 성립
+                matched.append(iss)
+                break
+            if evaluate(match_rule, ctx):
+                matched.append(iss)
+                break  # 한 affects 항목이라도 매칭되면 충분
+    return matched

@@ -118,7 +118,7 @@ def matched_issues(
     ctx = MatcherContext.from_variant(variant)
 
     t0 = time.perf_counter()
-    matched: list[IssueResponse] = match_issues_for_variant(ctx, cache.issues)
+    matched: list[IssueResponse] = match_issues_for_variant(ctx, cache.issues, scenario_id=scenario_id)
     eval_ms = (time.perf_counter() - t0) * 1000
 
     return {

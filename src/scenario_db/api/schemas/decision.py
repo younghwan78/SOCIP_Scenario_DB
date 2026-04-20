@@ -23,9 +23,9 @@ class IssueResponse(BaseModel):
     id: str
     schema_version: str
     metadata_: dict = {}
-    affects: dict | None = None
+    affects: list | None = None       # list[{scenario_ref, match_rule}]
     affects_ip: list | None = None
-    pmu_signature: dict | None = None
+    pmu_signature: list | None = None  # list[{counter, threshold}]
     resolution: dict | None = None
 
 
