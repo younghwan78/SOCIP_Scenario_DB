@@ -17,12 +17,19 @@ from scenario_db.db.session import make_session_factory
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
+    is_sqlite = settings.database_url.startswith("sqlite")
     engine = create_engine(
         settings.database_url,
-        pool_size=settings.db_pool_size,
-        max_overflow=settings.db_max_overflow,
-        pool_pre_ping=True,
-        pool_recycle=3600,
+        **(
+            {}
+            if is_sqlite
+            else {
+                "pool_size": settings.db_pool_size,
+                "max_overflow": settings.db_max_overflow,
+                "pool_pre_ping": True,
+                "pool_recycle": 3600,
+            }
+        ),
     )
     app.state.engine = engine
     app.state.session_factory = make_session_factory(engine)

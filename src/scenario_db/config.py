@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+from pydantic import Field
+from pydantic.aliases import AliasChoices
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    database_url: str = "sqlite:///:memory:"  # 테스트/import 시 기본값; 실서버는 .env에서 주입
+    # SCENARIO_DB_DATABASE_URL 우선, 없으면 DATABASE_URL 읽음 (기존 .env 호환)
+    database_url: str = Field(
+        default="sqlite:///:memory:",
+        validation_alias=AliasChoices("SCENARIO_DB_DATABASE_URL", "DATABASE_URL"),
+    )
     api_port: int = 8000
     cors_origins: list[str] = ["http://localhost:8501", "http://localhost:3000"]
     log_level: str = "INFO"
