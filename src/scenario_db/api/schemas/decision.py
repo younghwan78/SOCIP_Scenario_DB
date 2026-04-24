@@ -52,7 +52,7 @@ class ReviewResponse(BaseModel):
     variant_ref: str
     evidence_refs: list | None = None
     gate_result: str | None = None
-    auto_checks: dict | None = None
+    auto_checks: list | None = None
     decision: str | None = None
     waiver_ref: str | None = None
     rationale: str | None = None

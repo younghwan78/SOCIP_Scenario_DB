@@ -21,7 +21,7 @@ class ScenarioResponse(BaseModel):
     metadata_: dict = {}
     pipeline: dict = {}
     size_profile: dict | None = None
-    design_axes: dict | None = None
+    design_axes: list | None = None
 
 
 class ScenarioVariantResponse(BaseModel):

@@ -20,9 +20,9 @@ class EvidenceResponse(BaseModel):
     aggregation: dict = {}
     kpi: dict = {}
     run_info: dict | None = None
-    ip_breakdown: dict | None = None
+    ip_breakdown: list | None = None
     provenance: dict | None = None
-    artifacts: dict | None = None
+    artifacts: list | None = None
     sw_version_hint: str | None = None
 
 
