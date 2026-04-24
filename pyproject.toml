@@ -45,9 +45,8 @@ notebook = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests/unit"]
 markers = [
     "unit: pure Python, no external deps",
     "integration: requires Docker + PostgreSQL testcontainer",
 ]
-addopts = "-m 'not integration'"
