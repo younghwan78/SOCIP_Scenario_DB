@@ -6,7 +6,7 @@ pytestmark = pytest.mark.integration
 
 SCENARIO_ID = "uc-camera-recording"
 VARIANT_ID = "UHD60-HDR10-H265"
-BASE = f"/api/v1/variants/{SCENARIO_ID}/{VARIANT_ID}/matched-issues"
+BASE = f"/api/v1/scenarios/{SCENARIO_ID}/variants/{VARIANT_ID}/matched-issues"
 
 
 def test_endpoint_returns_200(api_client: TestClient):
@@ -51,10 +51,10 @@ def test_eval_time_is_positive(api_client: TestClient):
 
 
 def test_404_on_unknown_variant(api_client: TestClient):
-    resp = api_client.get(f"/api/v1/variants/{SCENARIO_ID}/no-such-variant/matched-issues")
+    resp = api_client.get(f"/api/v1/scenarios/{SCENARIO_ID}/variants/no-such-variant/matched-issues")
     assert resp.status_code == 404
 
 
 def test_404_on_unknown_scenario(api_client: TestClient):
-    resp = api_client.get(f"/api/v1/variants/no-such-scenario/{VARIANT_ID}/matched-issues")
+    resp = api_client.get(f"/api/v1/scenarios/no-such-scenario/variants/{VARIANT_ID}/matched-issues")
     assert resp.status_code == 404

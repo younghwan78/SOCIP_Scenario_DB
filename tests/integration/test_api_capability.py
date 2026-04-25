@@ -33,14 +33,14 @@ def test_soc_platform_404(api_client: TestClient):
 # ---------------------------------------------------------------------------
 
 def test_ip_catalog_returns_data(api_client: TestClient):
-    resp = api_client.get("/api/v1/ip-catalog")
+    resp = api_client.get("/api/v1/ip-catalogs")
     assert resp.status_code == 200
     assert resp.json()["total"] >= 1
 
 
 def test_ip_catalog_category_filter_valid_returns_200(api_client: TestClient):
     """whitelist에 포함된 category 필터는 항상 200 반환 (결과 0개도 유효)."""
-    resp = api_client.get("/api/v1/ip-catalog", params={"category": "ISP"})
+    resp = api_client.get("/api/v1/ip-catalogs", params={"category": "ISP"})
     assert resp.status_code == 200
     data = resp.json()
     # demo 픽스처의 IP category 값은 'camera'/'codec'/'memory'/'display' 등 소문자 사용 →
@@ -49,12 +49,12 @@ def test_ip_catalog_category_filter_valid_returns_200(api_client: TestClient):
 
 
 def test_ip_catalog_invalid_category_400(api_client: TestClient):
-    resp = api_client.get("/api/v1/ip-catalog", params={"category": "INVALID_CAT"})
+    resp = api_client.get("/api/v1/ip-catalogs", params={"category": "INVALID_CAT"})
     assert resp.status_code == 400
 
 
 def test_get_ip_by_id(api_client: TestClient):
-    resp = api_client.get("/api/v1/ip-catalog/ip-isp-v12")
+    resp = api_client.get("/api/v1/ip-catalogs/ip-isp-v12")
     assert resp.status_code == 200
     assert resp.json()["id"] == "ip-isp-v12"
 

@@ -9,8 +9,9 @@ API smoke test — FastAPI dependency override + MagicMock (DB 없이 실행).
 커버리지:
   - 전체 GET 엔드포인트 2xx / 4xx 응답 검증
   - PagedResponse 구조 검증
-  - /health 응답 구조
-  - 404 동작, 400 validation, 501 stubs
+  - /health/live + /health/ready 응답 구조
+  - 404 동작, 400 validation
+  - sort_by/sort_dir 파라미터 통과 검증
 """
 
 from __future__ import annotations
@@ -61,7 +62,6 @@ def client():
 
     mock_session = _mock_session_empty()
 
-    # lifespan을 no-op으로 교체 (DB 연결 없이 테스트)
     @asynccontextmanager
     async def _noop_lifespan(a):
         a.state.engine = None
@@ -86,16 +86,29 @@ def client():
 
 
 # ---------------------------------------------------------------------------
-# /health
+# /health/live + /health/ready
 # ---------------------------------------------------------------------------
 
-def test_health(client):
-    r = client.get("/health")
+def test_health_live(client):
+    r = client.get("/health/live")
     assert r.status_code == 200
+    assert r.json()["status"] == "ok"
+
+
+def test_health_ready_structure(client):
+    # mock session_factory()는 execute("SELECT 1") 성공 → db_ok=True
+    r = client.get("/health/ready")
     body = r.json()
     assert "status" in body
+    assert "db" in body
     assert "rule_cache" in body
     assert "uptime_s" in body
+
+
+def test_health_old_path_404(client):
+    """기존 /health 경로는 더 이상 존재하지 않아야 함."""
+    r = client.get("/health")
+    assert r.status_code == 404
 
 
 # ---------------------------------------------------------------------------
@@ -116,18 +129,18 @@ def test_get_soc_platform_404(client):
     assert r.status_code == 404
 
 
-def test_list_ip_catalog_200(client):
-    r = client.get("/api/v1/ip-catalog")
+def test_list_ip_catalogs_200(client):
+    r = client.get("/api/v1/ip-catalogs")
     assert r.status_code == 200
 
 
-def test_list_ip_catalog_invalid_category_400(client):
-    r = client.get("/api/v1/ip-catalog?category=INVALID")
+def test_list_ip_catalogs_invalid_category_400(client):
+    r = client.get("/api/v1/ip-catalogs?category=INVALID")
     assert r.status_code == 400
 
 
-def test_list_ip_catalog_valid_category_200(client):
-    r = client.get("/api/v1/ip-catalog?category=ISP")
+def test_list_ip_catalogs_valid_category_200(client):
+    r = client.get("/api/v1/ip-catalogs?category=ISP")
     assert r.status_code == 200
 
 
@@ -196,7 +209,7 @@ def test_get_variant_404(client):
 
 
 def test_matched_issues_404(client):
-    r = client.get("/api/v1/variants/nonexistent/v1/matched-issues")
+    r = client.get("/api/v1/scenarios/nonexistent/variants/v1/matched-issues")
     assert r.status_code == 404
 
 
@@ -284,7 +297,7 @@ def test_list_gate_rules_200(client):
 
 
 # ---------------------------------------------------------------------------
-# Pagination 파라미터 전달 검증
+# Pagination 구조 + sort 파라미터 통과 검증
 # ---------------------------------------------------------------------------
 
 def test_pagination_structure(client):
@@ -296,25 +309,35 @@ def test_pagination_structure(client):
     assert isinstance(body["has_next"], bool)
 
 
+def test_sort_asc_accepted(client):
+    r = client.get("/api/v1/soc-platforms?sort_by=id&sort_dir=asc")
+    assert r.status_code == 200
+
+
+def test_sort_desc_accepted(client):
+    r = client.get("/api/v1/ip-catalogs?sort_dir=desc")
+    assert r.status_code == 200
+
+
+def test_sort_invalid_column_400(client):
+    r = client.get("/api/v1/soc-platforms?sort_by=nonexistent_col")
+    assert r.status_code == 400
+
+
+def test_sort_invalid_dir_400(client):
+    r = client.get("/api/v1/soc-platforms?sort_dir=INVALID")
+    assert r.status_code == 400
+
+
 # ---------------------------------------------------------------------------
-# 501 stubs
+# Admin 엔드포인트 제거 확인
 # ---------------------------------------------------------------------------
 
-def test_stub_generate_yaml_501(client):
+def test_admin_cache_refresh_not_exposed(client):
+    r = client.post("/api/v1/admin/cache/refresh")
+    assert r.status_code in (404, 405)
+
+
+def test_stub_generate_yaml_not_exposed(client):
     r = client.post("/api/v1/variants/generate-yaml")
-    assert r.status_code == 501
-
-
-def test_stub_create_variant_501(client):
-    r = client.post("/api/v1/scenarios/s1/variants")
-    assert r.status_code == 501
-
-
-def test_stub_submit_review_501(client):
-    r = client.post("/api/v1/scenarios/s1/variants/v1/review")
-    assert r.status_code == 501
-
-
-def test_stub_etl_trigger_501(client):
-    r = client.post("/api/v1/admin/etl/trigger")
-    assert r.status_code == 501
+    assert r.status_code in (404, 405)

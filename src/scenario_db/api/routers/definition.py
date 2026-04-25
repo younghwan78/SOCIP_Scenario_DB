@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from scenario_db.api.cache import RuleCache, match_issues_for_variant
 from scenario_db.api.deps import get_db, get_rule_cache
+from scenario_db.api.pagination import apply_sort, validate_sort_column
 from scenario_db.api.schemas.common import PagedResponse
 from scenario_db.api.schemas.decision import IssueResponse
 from scenario_db.api.schemas.definition import (
@@ -29,9 +30,13 @@ router = APIRouter(tags=["definition"])
 def list_projects(
     limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    sort_by: str | None = Query(None),
+    sort_dir: str = Query("asc"),
     db: Session = Depends(get_db),
 ):
-    return PagedResponse.from_query(db.query(Project), limit=limit, offset=offset)
+    sort_by = validate_sort_column(Project, sort_by)
+    q = apply_sort(db.query(Project), Project, sort_by, sort_dir)
+    return PagedResponse.from_query(q, limit=limit, offset=offset)
 
 
 @router.get("/projects/{project_id}", response_model=ProjectResponse)
@@ -50,9 +55,13 @@ def get_project(project_id: str, db: Session = Depends(get_db)):
 def list_scenarios(
     limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    sort_by: str | None = Query(None),
+    sort_dir: str = Query("asc"),
     db: Session = Depends(get_db),
 ):
-    return PagedResponse.from_query(db.query(Scenario), limit=limit, offset=offset)
+    sort_by = validate_sort_column(Scenario, sort_by)
+    q = apply_sort(db.query(Scenario), Scenario, sort_by, sort_dir)
+    return PagedResponse.from_query(q, limit=limit, offset=offset)
 
 
 @router.get("/scenarios/{scenario_id}", response_model=ScenarioResponse)
@@ -68,12 +77,16 @@ def list_variants_for_scenario(
     scenario_id: str,
     limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    sort_by: str | None = Query(None),
+    sort_dir: str = Query("asc"),
     db: Session = Depends(get_db),
 ):
     scenario = db.query(Scenario).filter_by(id=scenario_id).one_or_none()
     if scenario is None:
         raise NoResultFound(f"Scenario '{scenario_id}' not found")
+    sort_by = validate_sort_column(ScenarioVariant, sort_by)
     q = db.query(ScenarioVariant).filter_by(scenario_id=scenario_id)
+    q = apply_sort(q, ScenarioVariant, sort_by, sort_dir)
     return PagedResponse.from_query(q, limit=limit, offset=offset)
 
 
@@ -96,7 +109,7 @@ def get_variant(scenario_id: str, variant_id: str, db: Session = Depends(get_db)
 # Matched Issues — P1 핵심 엔드포인트
 # ---------------------------------------------------------------------------
 
-@router.get("/variants/{scenario_id}/{variant_id}/matched-issues")
+@router.get("/scenarios/{scenario_id}/variants/{variant_id}/matched-issues")
 def matched_issues(
     scenario_id: str,
     variant_id: str,
@@ -139,9 +152,12 @@ def list_all_variants(
     tag: str | None = Query(None, description="tags 배열에 포함된 값 필터"),
     limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    sort_by: str | None = Query(None),
+    sort_dir: str = Query("asc"),
     db: Session = Depends(get_db),
 ):
     """전체 variant 목록 (cross-scenario). ?project=, ?severity=, ?tag= 필터 지원."""
+    sort_by = validate_sort_column(ScenarioVariant, sort_by)
     q = db.query(ScenarioVariant)
     if severity is not None:
         q = q.filter(ScenarioVariant.severity == severity)
@@ -151,4 +167,5 @@ def list_all_variants(
         q = q.join(Scenario, ScenarioVariant.scenario_id == Scenario.id).filter(
             Scenario.project_ref == project
         )
+    q = apply_sort(q, ScenarioVariant, sort_by, sort_dir)
     return PagedResponse.from_query(q, limit=limit, offset=offset)

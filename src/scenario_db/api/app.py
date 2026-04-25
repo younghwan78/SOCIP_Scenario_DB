@@ -9,7 +9,8 @@ from sqlalchemy import create_engine
 
 from scenario_db.api.cache import RuleCache
 from scenario_db.api.exceptions import register_handlers
-from scenario_db.api.routers import capability, decision, definition, evidence, utility
+from scenario_db.api.routers import capability, decision, definition, evidence
+from scenario_db.api.routers.utility import health_router
 from scenario_db.config import get_settings
 from scenario_db.db.session import make_session_factory
 
@@ -58,8 +59,8 @@ def create_app() -> FastAPI:
 
     register_handlers(app)
 
-    # /health — prefix 없음
-    app.include_router(utility.health_router)
+    # /health/live, /health/ready — prefix 없음
+    app.include_router(health_router)
 
     # /api/v1/*
     for r in [
@@ -67,7 +68,6 @@ def create_app() -> FastAPI:
         definition.router,
         evidence.router,
         decision.router,
-        utility.router,
     ]:
         app.include_router(r, prefix="/api/v1")
 

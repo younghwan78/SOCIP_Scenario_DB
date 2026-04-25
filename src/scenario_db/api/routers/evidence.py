@@ -5,6 +5,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from scenario_db.api.deps import get_db
+from scenario_db.api.pagination import apply_sort, validate_sort_column
 from scenario_db.api.schemas.common import PagedResponse
 from scenario_db.api.schemas.evidence import EvidenceResponse
 from scenario_db.db.models.evidence import Evidence
@@ -17,10 +18,7 @@ def evidence_summary(
     groupby: str = Query("sw_version_hint", description="쉼표 구분 컬럼 (sw_version_hint, overall_feasibility)"),
     db: Session = Depends(get_db),
 ):
-    """
-    Evidence 집계 요약. groupby 컬럼별 count.
-    지원 컬럼: sw_version_hint, overall_feasibility.
-    """
+    """Evidence 집계 요약. groupby 컬럼별 count."""
     ALLOWED = {"sw_version_hint", "overall_feasibility"}
     cols = [c.strip() for c in groupby.split(",")]
     invalid = set(cols) - ALLOWED
@@ -53,9 +51,12 @@ def list_evidence(
     feasibility: str | None = Query(None, description="overall_feasibility 필터"),
     limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    sort_by: str | None = Query(None),
+    sort_dir: str = Query("asc"),
     db: Session = Depends(get_db),
 ):
     """Evidence 목록 조회. 다중 필터 지원."""
+    sort_by = validate_sort_column(Evidence, sort_by)
     q = db.query(Evidence)
     if scenario_ref is not None:
         q = q.filter(Evidence.scenario_ref == scenario_ref)
@@ -65,6 +66,7 @@ def list_evidence(
         q = q.filter(Evidence.sw_version_hint == sw_version)
     if feasibility is not None:
         q = q.filter(Evidence.overall_feasibility == feasibility)
+    q = apply_sort(q, Evidence, sort_by, sort_dir)
     return PagedResponse.from_query(q, limit=limit, offset=offset)
 
 
