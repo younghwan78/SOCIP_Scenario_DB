@@ -43,6 +43,10 @@ notebook = [
     "ipywidgets>=8.0",
     "python-dotenv>=1.2.2",
 ]
+dashboard = [
+    "streamlit>=1.40",
+    "requests>=2.31",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/unit"]
