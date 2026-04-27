@@ -26,7 +26,7 @@ st.set_page_config(
 )
 
 from scenario_db.view.service import build_sample_level0
-from dashboard.components.cytoscape_viewer import (
+from dashboard.components.elk_viewer import (
     ALL_EDGE_TYPES, ALL_LAYERS, render_level0,
 )
 from dashboard.components.node_detail_panel import render_inspector

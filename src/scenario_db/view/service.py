@@ -73,7 +73,8 @@ def build_sample_level0() -> ViewResponse:
            warning=False),
 
         # HW lane — ISP active scale 4000x3000→1920x1080
-        _n("hw-sensor",  "Sensor",  "ip", "hw", 120, ly["hw"],
+        # hw-sensor x=130: min valid = LANE_LABEL_W(80) + NODE_W["ip"](100)/2 = 130
+        _n("hw-sensor",  "Sensor",  "ip", "hw", 130, ly["hw"],
            view_hints=ViewHints(lane="hw", stage="capture", order=0, emphasis="primary")),
         _n("hw-csis",    "CSIS",    "ip", "hw", 240, ly["hw"],
            view_hints=ViewHints(lane="hw", stage="capture", order=1)),
@@ -157,9 +158,12 @@ def build_sample_level0() -> ViewResponse:
         _e("e-hw-mfc-dpu",   "hw-mfc",    "hw-dpu",   "M2M"),
 
         # HW → Buffer writes (M2M vertical)
-        _e("e-isp-buf-yuv",   "hw-isp",  "buf-yuv",    "M2M"),
-        _e("e-mfc-buf-out",   "hw-mfc",  "buf-enc-out", "M2M"),
-        _e("e-dpu-buf-disp",  "hw-dpu",  "buf-disp",   "M2M"),
+        _e("e-isp-buf-yuv",   "hw-isp",  "buf-yuv",    "M2M",
+           memory=MemoryDescriptor(format="NV12", bitdepth=8, width=1920, height=1080, fps=30)),
+        _e("e-mfc-buf-out",   "hw-mfc",  "buf-enc-out", "M2M",
+           memory=MemoryDescriptor(format="H.265", fps=30)),
+        _e("e-dpu-buf-disp",  "hw-dpu",  "buf-disp",   "M2M",
+           memory=MemoryDescriptor(format="ARGB8888", width=1920, height=1080, fps=30)),
 
         # Buffer lane — vOTF chain (left to right)
         _e("e-buf-raw-yuv",  "buf-raw",    "buf-yuv",    "vOTF"),
