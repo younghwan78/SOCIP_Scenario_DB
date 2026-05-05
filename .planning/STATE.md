@@ -3,8 +3,8 @@
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
 - **Current Phase**: Phase 1 — DB Foundation
-- **Status**: Ready to plan
-- **Last Updated**: 2026-05-05
+- **Status**: Context gathered — ready to plan
+- **Last Updated**: 2026-05-06
 
 ---
 
@@ -60,5 +60,6 @@ None.
 _Updated after each phase transition._
 
 - **Phase 1 start**: 2026-05-05
+- **Phase 1 context**: 2026-05-06 (`.planning/phases/01-db-foundation/01-CONTEXT.md`)
 - **Phase 1 end**: TBD
 - **Phase 2 start**: TBD
