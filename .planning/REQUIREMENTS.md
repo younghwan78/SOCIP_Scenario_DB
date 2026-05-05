@@ -102,15 +102,47 @@ _Generated: 2026-05-05_
 
 ## Traceability
 
-_(filled by roadmapper)_
+_Updated: 2026-05-05 by roadmapper_
 
-| REQ-ID | Phase | Plan |
-|--------|-------|------|
-| DB-01~03 | | |
-| RES-01~03 | | |
-| GATE-01~05 | | |
-| API-01~04 | | |
-| VIEW-01~05 | | |
-| SIM-01~09 | | |
-| SCH-01~05 | | |
-| SAPI-01~06 | | |
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| DB-01 | Phase 1: DB Foundation | Pending |
+| DB-02 | Phase 1: DB Foundation | Pending |
+| DB-03 | Phase 1: DB Foundation | Pending |
+| RES-01 | Phase 2: Resolver & Gate Engine | Pending |
+| RES-02 | Phase 2: Resolver & Gate Engine | Pending |
+| RES-03 | Phase 2: Resolver & Gate Engine | Pending |
+| GATE-01 | Phase 2: Resolver & Gate Engine | Pending |
+| GATE-02 | Phase 2: Resolver & Gate Engine | Pending |
+| GATE-03 | Phase 2: Resolver & Gate Engine | Pending |
+| GATE-04 | Phase 2: Resolver & Gate Engine | Pending |
+| GATE-05 | Phase 2: Resolver & Gate Engine | Pending |
+| API-01 | Phase 3: Runtime API | Pending |
+| API-02 | Phase 3: Runtime API | Pending |
+| API-03 | Phase 3: Runtime API | Pending |
+| API-04 | Phase 3: Runtime API | Pending |
+| VIEW-01 | Phase 4: Level 0 Viewer DB | Pending |
+| VIEW-02 | Phase 4: Level 0 Viewer DB | Pending |
+| VIEW-03 | Phase 4: Level 0 Viewer DB | Pending |
+| VIEW-04 | Phase 4: Level 0 Viewer DB | Pending |
+| VIEW-05 | Phase 4: Level 0 Viewer DB | Pending |
+| SCH-01 | Phase 5: Schema Extensions | Pending |
+| SCH-02 | Phase 5: Schema Extensions | Pending |
+| SCH-03 | Phase 5: Schema Extensions | Pending |
+| SCH-04 | Phase 5: Schema Extensions | Pending |
+| SCH-05 | Phase 5: Schema Extensions | Pending |
+| SIM-01 | Phase 6: sim/ Package | Pending |
+| SIM-02 | Phase 6: sim/ Package | Pending |
+| SIM-03 | Phase 6: sim/ Package | Pending |
+| SIM-04 | Phase 6: sim/ Package | Pending |
+| SIM-05 | Phase 6: sim/ Package | Pending |
+| SIM-06 | Phase 6: sim/ Package | Pending |
+| SIM-07 | Phase 6: sim/ Package | Pending |
+| SIM-08 | Phase 6: sim/ Package | Pending |
+| SIM-09 | Phase 6: sim/ Package | Pending |
+| SAPI-01 | Phase 7: Simulation API | Pending |
+| SAPI-02 | Phase 7: Simulation API | Pending |
+| SAPI-03 | Phase 7: Simulation API | Pending |
+| SAPI-04 | Phase 7: Simulation API | Pending |
+| SAPI-05 | Phase 7: Simulation API | Pending |
+| SAPI-06 | Phase 7: Simulation API | Pending |
