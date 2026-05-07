@@ -234,11 +234,24 @@ def project_level0(scenario_id: str, variant_id: str, db=None) -> ViewResponse:
     """Project DB data into a Level 0 ViewResponse.
 
     Falls back to sample data when db is None (dashboard demo mode).
+    DB path queries via get_view_projection() Repository (Phase 1 wiring).
+    Full ELK layout construction from DB data is Phase 4 (VIEW-01).
     """
     if db is None:
         return build_sample_level0()
-    # TODO: query DB → assemble canonical graph → project to Level 0
-    raise NotImplementedError("DB-backed Level 0 projection is Phase C work")
+
+    from scenario_db.db.repositories.view_projection import get_view_projection
+    projection = get_view_projection(db, scenario_id, variant_id)
+    if projection is None:
+        from scenario_db.api.exceptions import NotFoundError
+        raise NotFoundError(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
+
+    # Phase 4 (VIEW-01): construct full ELK layout from projection["lanes"] and
+    # projection["ip_catalog"]. Until then, return demo layout with DB-sourced IDs.
+    response = build_sample_level0()
+    return ViewResponse(
+        **{**response.model_dump(), "scenario_id": scenario_id, "variant_id": variant_id},
+    )
 
 
 def project_level1(scenario_id: str, variant_id: str, db=None) -> ViewResponse:
