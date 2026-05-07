@@ -59,11 +59,22 @@ LOAD_ORDER = [
 ]
 
 
-def load_yaml_dir(directory: Path, session: Session) -> dict[str, int]:
+def load_yaml_dir(
+    directory: Path,
+    session: Session,
+    *,
+    raise_on_errors: bool = False,
+) -> dict[str, int]:
     """
     디렉터리 내 모든 YAML을 kind 기준으로 적재.
     파일 단위 SAVEPOINT — 오류 파일은 skip, 나머지는 보존.
     반환: {kind: 성공 건수}
+
+    Args:
+        directory: YAML 파일이 위치한 루트 디렉터리.
+        session: SQLAlchemy Session (commit은 내부에서 처리).
+        raise_on_errors: True이면 post-load validation 오류 발생 시 RuntimeError를 raise한다.
+                         기존 호출자는 False(기본값)로 영향 없음.
     """
     # 파일 발견 → kind별 그룹화
     by_kind: dict[str, list[tuple[Path, dict, str]]] = defaultdict(list)
@@ -110,6 +121,10 @@ def load_yaml_dir(directory: Path, session: Session) -> dict[str, int]:
 
     total = sum(counts.values())
     logger.info("ETL complete — %d loaded, %d skipped", total, len(skipped))
+    if raise_on_errors and _report.errors:
+        raise RuntimeError(
+            f"Post-load validation failed ({len(_report.errors)} errors): {_report.errors[0]}"
+        )
     return counts
 
 
