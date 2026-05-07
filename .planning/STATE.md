@@ -3,7 +3,7 @@
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
 - **Current Phase**: Phase 1 — DB Foundation
-- **Status**: Ready to execute — 3 plans in 2 waves
+- **Status**: In progress — Wave 1 complete (2/3 plans), Wave 2 starting
 - **Last Updated**: 2026-05-07
 
 ---
