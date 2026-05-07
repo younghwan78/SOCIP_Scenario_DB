@@ -89,6 +89,10 @@ def validate_loaded(session: Session) -> ValidationReport:
             errors.append(
                 f"evidence '{ev_id}': scenario_ref '{ev_scenario_ref}' not found in scenarios"
             )
+        elif ev_variant_ref is None:
+            errors.append(
+                f"evidence '{ev_id}': variant_ref is None (nullable=False 위반)"
+            )
         elif (ev_scenario_ref, ev_variant_ref) not in variant_keys:
             errors.append(
                 f"evidence '{ev_id}': variant_ref '{ev_variant_ref}' "
@@ -110,6 +114,10 @@ def validate_loaded(session: Session) -> ValidationReport:
         if rev_scenario_ref not in scenario_ids:
             errors.append(
                 f"review '{rev_id}': scenario_ref '{rev_scenario_ref}' not found in scenarios"
+            )
+        elif rev_variant_ref is None:
+            errors.append(
+                f"review '{rev_id}': variant_ref is None (nullable=False 위반)"
             )
         elif (rev_scenario_ref, rev_variant_ref) not in variant_keys:
             errors.append(
