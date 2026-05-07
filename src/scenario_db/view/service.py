@@ -246,8 +246,9 @@ def project_level0(scenario_id: str, variant_id: str, db=None) -> ViewResponse:
         from scenario_db.api.exceptions import NotFoundError
         raise NotFoundError(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
 
-    # Phase 4 (VIEW-01): construct full ELK layout from projection["lanes"] and
-    # projection["ip_catalog"]. Until then, return demo layout with DB-sourced IDs.
+    # NOTE: Until Phase 4 (VIEW-01), this returns demo layout with DB-sourced IDs.
+    # Full ELK projection from DB data is VIEW-01 work.
+    # projection["lanes"] / projection["ip_catalog"] are available but not yet consumed.
     response = build_sample_level0()
     return ViewResponse(
         **{**response.model_dump(), "scenario_id": scenario_id, "variant_id": variant_id},
