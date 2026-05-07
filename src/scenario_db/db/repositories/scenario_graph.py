@@ -273,12 +273,16 @@ def get_canonical_graph(
     else:
         ip_catalog_rows = []
 
-    # Query 4: SW Profiles (variant.sw_requirements의 profile_ref 목록)
+    # Query 4: SW Profiles (variant.sw_requirements의 profile_constraints 기반)
+    # ProfileConstraints 구조: {min_version: str, baseline_family: list[str]}
+    # — list[{profile_ref}] 형태가 아님에 주의 (CR-02 수정)
     sw_req = variant.sw_requirements or {}
     sw_profile_refs: set[str] = set()
-    for item in sw_req.get("profile_constraints", []) if isinstance(sw_req, dict) else []:
-        if isinstance(item, dict) and "profile_ref" in item:
-            sw_profile_refs.add(item["profile_ref"])
+    if isinstance(sw_req, dict):
+        pc = sw_req.get("profile_constraints")
+        if isinstance(pc, dict):
+            for ref in pc.get("baseline_family", []):
+                sw_profile_refs.add(ref)
     if sw_profile_refs:
         sw_profile_rows = db.query(SwProfile).filter(SwProfile.id.in_(sw_profile_refs)).all()
     else:
