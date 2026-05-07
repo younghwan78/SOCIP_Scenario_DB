@@ -69,13 +69,14 @@ def load_yaml_dir(directory: Path, session: Session) -> dict[str, int]:
     by_kind: dict[str, list[tuple[Path, dict, str]]] = defaultdict(list)
     for path in sorted(directory.rglob("*.yaml")):
         try:
-            raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+            raw_bytes = path.read_bytes()
+            sha256 = hashlib.sha256(raw_bytes).hexdigest()
+            raw = yaml.safe_load(raw_bytes.decode("utf-8"))
         except Exception as exc:
             logger.warning("YAML parse failed %s: %s", path.name, exc)
             continue
         kind = raw.get("kind") if isinstance(raw, dict) else None
         if kind and kind in MAPPER_REGISTRY:
-            sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
             by_kind[kind].append((path, raw, sha256))
         elif kind:
             logger.debug("no mapper for kind=%s (%s)", kind, path.name)
