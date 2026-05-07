@@ -3,8 +3,8 @@
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
 - **Current Phase**: Phase 1 — DB Foundation
-- **Status**: Context gathered — ready to plan
-- **Last Updated**: 2026-05-06
+- **Status**: Ready to execute — 3 plans in 2 waves
+- **Last Updated**: 2026-05-07
 
 ---
 
@@ -21,7 +21,7 @@ Progress: ░░░░░░░░░░░░░░░░░░░░ 0 / 7 pha
 
 | Phase | Name | Milestone | Depends On | Status |
 |-------|------|-----------|------------|--------|
-| 1 | DB Foundation | M1 | — | Not started |
+| 1 | DB Foundation | M1 | — | Ready to execute |
 | 2 | Resolver & Gate Engine | M1 | Phase 1 | Not started |
 | 3 | Runtime API | M1 | Phase 1, 2 | Not started |
 | 4 | Level 0 Viewer DB | M1 | Phase 3 | Not started |
@@ -61,5 +61,6 @@ _Updated after each phase transition._
 
 - **Phase 1 start**: 2026-05-05
 - **Phase 1 context**: 2026-05-06 (`.planning/phases/01-db-foundation/01-CONTEXT.md`)
+- **Phase 1 planned**: 2026-05-07 — 3 plans (PLAN-01 Wave1, PLAN-02 Wave1, PLAN-03 Wave2)
 - **Phase 1 end**: TBD
 - **Phase 2 start**: TBD

@@ -30,9 +30,15 @@ _Created: 2026-05-05_
   4. 존재하지 않는 scenario_id 요청 시 명확한 NotFound 응답이 반환된다
 **Plans**: 3 plans
 Plans:
+**Wave 1** *(병렬 실행 가능)*
 - [ ] 01-PLAN-01.md — ETL semantic validation (validate_loaded.py + loader.py 통합 + FHD30 fixture)
 - [ ] 01-PLAN-02.md — CanonicalScenarioGraph DTO + get_canonical_graph() 구현
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-PLAN-03.md — view_projection Repository + Phase 1 통합 테스트 완성
+
+Cross-cutting constraints:
+- 모든 Pydantic DTO: `ConfigDict(extra='forbid')` + `from_attributes=True` (D-05, D-07)
 **UI hint**: no
 
 ---
@@ -137,7 +143,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. DB Foundation | 0/3 | Planned | - |
+| 1. DB Foundation | 0/3 | Ready to execute | - |
 | 2. Resolver & Gate Engine | 0/3 | Not started | - |
 | 3. Runtime API | 0/3 | Not started | - |
 | 4. Level 0 Viewer DB | 0/3 | Not started | - |
