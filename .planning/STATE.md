@@ -3,7 +3,7 @@
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
 - **Current Phase**: Phase 1 — DB Foundation
-- **Status**: In progress — Wave 1 complete (2/3 plans), Wave 2 starting
+- **Status**: Phase 1 COMPLETE — 3/3 plans done. Phase 2 ready.
 - **Last Updated**: 2026-05-07
 
 ---
@@ -11,18 +11,18 @@
 ## Current Position
 
 ```
-Milestone 1: [Phase 1] → Phase 2 → Phase 3 → Phase 4
+Milestone 1: Phase 1 ✓ → [Phase 2] → Phase 3 → Phase 4
 Milestone 2: Phase 5 → Phase 6 → Phase 7
 
-Progress: ░░░░░░░░░░░░░░░░░░░░ 0 / 7 phases complete
+Progress: ███░░░░░░░░░░░░░░░░░ 1 / 7 phases complete
 ```
 
 ## Phase Sequence
 
 | Phase | Name | Milestone | Depends On | Status |
 |-------|------|-----------|------------|--------|
-| 1 | DB Foundation | M1 | — | Ready to execute |
-| 2 | Resolver & Gate Engine | M1 | Phase 1 | Not started |
+| 1 | DB Foundation | M1 | — | COMPLETE (3/3 plans) |
+| 2 | Resolver & Gate Engine | M1 | Phase 1 | Ready to execute |
 | 3 | Runtime API | M1 | Phase 1, 2 | Not started |
 | 4 | Level 0 Viewer DB | M1 | Phase 3 | Not started |
 | 5 | Schema Extensions | M2 | Phase 1, 4 | Not started |
@@ -41,6 +41,11 @@ Progress: ░░░░░░░░░░░░░░░░░░░░ 0 / 7 pha
 | View sample fallback 제거 | demo 모드만 허용 |
 | Simulation porting: Option B | sim/ 패키지 신규 생성, ScenarioGraph 재구현 없음 |
 | DVFS 테이블 YAML화 | `hw_config/dvfs-projectA.yaml` |
+| Soft validation 채택 (Phase 1) | validate_loaded() — 오류 수집 후 리포트, DB 상태 유지 |
+| model_validate() + from_attributes=True (Phase 1) | row.__dict__ 패턴 금지 — _sa_instance_state extra='forbid' 위반 |
+| 수동 6-쿼리 전략 (Phase 1) | ORM relationship 없이 joinedload/selectinload 금지, 수동 배치 쿼리 |
+| JSONB 필드 타입 dict\|list\|None (Phase 1) | ip_breakdown/artifacts/pmu_signature/auto_checks — fixture에서 list 사용 확인 |
+| get_view_projection() raw dict 반환 (Phase 1) | Pydantic DTO 없이 raw dict — Phase 3 라우터가 ViewResponse로 변환 |
 
 ### Existing Baseline
 
@@ -62,5 +67,5 @@ _Updated after each phase transition._
 - **Phase 1 start**: 2026-05-05
 - **Phase 1 context**: 2026-05-06 (`.planning/phases/01-db-foundation/01-CONTEXT.md`)
 - **Phase 1 planned**: 2026-05-07 — 3 plans (PLAN-01 Wave1, PLAN-02 Wave1, PLAN-03 Wave2)
-- **Phase 1 end**: TBD
+- **Phase 1 end**: 2026-05-07 (3 plans complete — validate_loaded, CanonicalScenarioGraph, view_projection + integration tests)
 - **Phase 2 start**: TBD

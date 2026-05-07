@@ -6,7 +6,7 @@ _Created: 2026-05-05_
 
 ## Phases
 
-- [ ] **Phase 1: DB Foundation** — ETL semantic validation + CanonicalScenarioGraph builder + repository 확장
+- [x] **Phase 1: DB Foundation** — ETL semantic validation + CanonicalScenarioGraph builder + repository 확장
 - [ ] **Phase 2: Resolver & Gate Engine** — 비영속 Resolver + GateExecutionResult 엔진 (순수 Python)
 - [ ] **Phase 3: Runtime API** — /graph, /resolve, /gate 엔드포인트 + view router DB 연동
 - [ ] **Phase 4: Level 0 Viewer DB** — project_level0(db) 구현, topology mode, gate overlay
@@ -35,7 +35,7 @@ Plans:
 - [x] 01-PLAN-02.md — CanonicalScenarioGraph DTO + get_canonical_graph() 구현
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 01-PLAN-03.md — view_projection Repository + Phase 1 통합 테스트 완성
+- [x] 01-PLAN-03.md — view_projection Repository + Phase 1 통합 테스트 완성
 
 Cross-cutting constraints:
 - 모든 Pydantic DTO: `ConfigDict(extra='forbid')` + `from_attributes=True` (D-05, D-07)
@@ -143,7 +143,7 @@ Cross-cutting constraints:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. DB Foundation | 2/3 | In progress | - |
+| 1. DB Foundation | 3/3 | COMPLETE | 2026-05-07 |
 | 2. Resolver & Gate Engine | 0/3 | Not started | - |
 | 3. Runtime API | 0/3 | Not started | - |
 | 4. Level 0 Viewer DB | 0/3 | Not started | - |
