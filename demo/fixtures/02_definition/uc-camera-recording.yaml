@@ -114,6 +114,18 @@ variants:
         if_any_fail: continue_with_flag
         result_flag: "exploration_only"
 
+  # --- FHD Standard variant ---
+  - id: FHD30-SDR-H265
+    severity: normal
+    design_conditions:
+      resolution: "1920x1080"
+      fps: 30
+      color_format: SDR
+      codec: H265
+    ip_requirements: {}
+    sw_requirements: {}
+    tags: [fhd, sdr, h265]
+
   # --- Derived variant ---
   - id: UHD60-HDR10-sustained-10min
     severity: critical
