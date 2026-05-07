@@ -2,9 +2,9 @@
 
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
-- **Current Phase**: Phase 1 — DB Foundation
-- **Status**: Phase 1 COMPLETE — 3/3 plans done. Phase 2 ready.
-- **Last Updated**: 2026-05-07
+- **Current Phase**: Phase 2 — Resolver & Gate Engine
+- **Status**: Phase 2 context gathered. Ready for planning.
+- **Last Updated**: 2026-05-08
 
 ---
 
@@ -22,7 +22,7 @@ Progress: ███░░░░░░░░░░░░░░░░░ 1 / 7 pha
 | Phase | Name | Milestone | Depends On | Status |
 |-------|------|-----------|------------|--------|
 | 1 | DB Foundation | M1 | — | COMPLETE (3/3 plans) |
-| 2 | Resolver & Gate Engine | M1 | Phase 1 | Ready to execute |
+| 2 | Resolver & Gate Engine | M1 | Phase 1 | Context gathered — Ready to plan |
 | 3 | Runtime API | M1 | Phase 1, 2 | Not started |
 | 4 | Level 0 Viewer DB | M1 | Phase 3 | Not started |
 | 5 | Schema Extensions | M2 | Phase 1, 4 | Not started |
@@ -68,4 +68,5 @@ _Updated after each phase transition._
 - **Phase 1 context**: 2026-05-06 (`.planning/phases/01-db-foundation/01-CONTEXT.md`)
 - **Phase 1 planned**: 2026-05-07 — 3 plans (PLAN-01 Wave1, PLAN-02 Wave1, PLAN-03 Wave2)
 - **Phase 1 end**: 2026-05-07 (3 plans complete — validate_loaded, CanonicalScenarioGraph, view_projection + integration tests)
-- **Phase 2 start**: TBD
+- **Phase 2 start**: 2026-05-08
+- **Phase 2 context**: 2026-05-08 (`.planning/phases/02-resolver-gate-engine/02-CONTEXT.md`)
