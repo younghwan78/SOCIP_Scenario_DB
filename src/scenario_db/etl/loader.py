@@ -97,6 +97,16 @@ def load_yaml_dir(directory: Path, session: Session) -> dict[str, int]:
 
     session.commit()
 
+    # semantic validation — commit 이후 DB 상태 검증 (D-03)
+    from scenario_db.etl.validate_loaded import validate_loaded
+    _report = validate_loaded(session)
+    if _report.errors:
+        for _err in _report.errors:
+            logger.warning("Validation: %s", _err)
+    if _report.warnings:
+        for _warn in _report.warnings:
+            logger.debug("Validation warning: %s", _warn)
+
     total = sum(counts.values())
     logger.info("ETL complete — %d loaded, %d skipped", total, len(skipped))
     return counts
