@@ -104,9 +104,9 @@ class EvidenceRecord(BaseModel):
     aggregation: dict
     kpi: dict
     run_info: dict | None = None
-    ip_breakdown: dict | None = None
-    provenance: dict | None = None
-    artifacts: dict | None = None
+    ip_breakdown: dict | list | None = None
+    provenance: dict | list | None = None
+    artifacts: dict | list | None = None
     yaml_sha256: str
     sw_version_hint: str | None = None
     sweep_value_hint: str | None = None
@@ -120,7 +120,7 @@ class IssueRecord(BaseModel):
     metadata_: dict
     affects: list | None = None
     affects_ip: list | None = None
-    pmu_signature: dict | None = None
+    pmu_signature: dict | list | None = None
     resolution: dict | None = None
     yaml_sha256: str
 
@@ -157,7 +157,7 @@ class ReviewRecord(BaseModel):
     variant_ref: str
     evidence_refs: list | None = None
     gate_result: str | None = None
-    auto_checks: dict | None = None
+    auto_checks: dict | list | None = None
     decision: str | None = None
     waiver_ref: str | None = None
     rationale: str | None = None
