@@ -116,7 +116,7 @@ variants:
 
   # --- FHD Standard variant ---
   - id: FHD30-SDR-H265
-    severity: normal
+    severity: light
     design_conditions:
       resolution: "1920x1080"
       fps: 30
