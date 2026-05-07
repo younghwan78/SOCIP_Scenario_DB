@@ -16,6 +16,7 @@ from scenario_db.db.models.capability import IpCatalog, SwProfile
 from scenario_db.db.models.decision import Issue, Review, Waiver
 from scenario_db.db.models.definition import Project, Scenario, ScenarioVariant
 from scenario_db.db.models.evidence import Evidence
+from scenario_db.db.utils import issue_affects_scenario
 
 
 # ---------------------------------------------------------------------------
@@ -198,24 +199,6 @@ class CanonicalScenarioGraph(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# 헬퍼 함수
-# ---------------------------------------------------------------------------
-
-
-def _issue_affects_scenario(affects: list[dict] | None, scenario_id: str) -> bool:
-    """Issue.affects JSONB에 scenario_id 또는 wildcard '*'가 포함되는지 확인.
-
-    affects 구조: list[{scenario_ref: str, match_rule: dict}]
-    """
-    if not affects:
-        return False
-    return any(
-        entry.get("scenario_ref") in ("*", scenario_id)
-        for entry in affects
-    )
-
-
-# ---------------------------------------------------------------------------
 # get_canonical_graph() — DB 조회 서비스
 # ---------------------------------------------------------------------------
 
@@ -259,7 +242,7 @@ def get_canonical_graph(
     # Query 2b: Issues (Python-level filter — affects JSONB, 소규모 fixture)
     # joinedload/selectinload 대신 전체 로드 후 Python 필터 (Finding 3)
     all_issues = db.query(Issue).all()
-    issues = [iss for iss in all_issues if _issue_affects_scenario(iss.affects, scenario_id)]
+    issues = [iss for iss in all_issues if issue_affects_scenario(iss.affects, scenario_id)]
 
     # Query 2c: Waivers (matched issue_refs — issue_ref IN (matched ids))
     matched_issue_ids = {iss.id for iss in issues}

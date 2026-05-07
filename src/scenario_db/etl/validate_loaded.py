@@ -12,6 +12,7 @@ from scenario_db.db.models.decision import GateRule, Issue, Waiver
 from scenario_db.db.models.definition import Project, Scenario, ScenarioVariant
 from scenario_db.db.models.evidence import Evidence
 from scenario_db.db.models.decision import Review
+from scenario_db.db.utils import issue_affects_scenario
 
 logger = logging.getLogger(__name__)
 
@@ -29,15 +30,6 @@ class ValidationReport(BaseModel):
         """오류 목록이 비어 있으면 유효."""
         return len(self.errors) == 0
 
-
-def _issue_affects_scenario(affects: list[dict] | None, scenario_id: str) -> bool:
-    """issue.affects 목록에서 특정 scenario_id 또는 wildcard '*'가 있으면 True."""
-    if not affects:
-        return False
-    return any(
-        entry.get("scenario_ref") in ("*", scenario_id)
-        for entry in affects
-    )
 
 
 def validate_loaded(session: Session) -> ValidationReport:
