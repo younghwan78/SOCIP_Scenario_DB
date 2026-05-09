@@ -78,3 +78,5 @@ _Updated after each phase transition._
 - **Phase 3 context**: 2026-05-10 (`.planning/phases/03-runtime-api/03-CONTEXT.md`)
 - **Phase 3 planned**: 2026-05-10 — 3 plans (PLAN-01 Wave1: Runtime router, PLAN-02 Wave1: View router, PLAN-03 Wave2: Integration tests)
 - **Phase 3 end**: 2026-05-10 (3 plans complete — runtime.py router, view mode DB projection, 8 new integration tests, 159 total passing)
+- **Phase 4 start**: 2026-05-10
+- **Phase 4 context**: 2026-05-10 (`.planning/phases/04-level0-viewer-db/04-CONTEXT.md`)
