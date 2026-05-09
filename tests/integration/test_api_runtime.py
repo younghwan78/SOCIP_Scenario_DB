@@ -70,3 +70,11 @@ def test_view_topology_mode_returns_501(api_client: TestClient):
         params={"level": 0, "mode": "topology"},
     )
     assert resp.status_code == 501
+
+
+def test_view_architecture_404(api_client: TestClient):
+    resp = api_client.get(
+        "/api/v1/scenarios/no-such-id/variants/no-such-vid/view",
+        params={"level": 0, "mode": "architecture"},
+    )
+    assert resp.status_code == 404
