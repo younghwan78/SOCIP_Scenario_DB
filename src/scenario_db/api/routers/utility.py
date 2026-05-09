@@ -24,9 +24,12 @@ def readiness(request: Request):
 
     db_ok = False
     try:
-        with request.app.state.session_factory() as s:
+        s = request.app.state.session_factory()
+        try:
             s.execute(text("SELECT 1"))
-        db_ok = True
+            db_ok = True
+        finally:
+            s.close()
     except Exception:
         pass
 
