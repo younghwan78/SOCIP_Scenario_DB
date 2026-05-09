@@ -54,7 +54,18 @@ Cross-cutting constraints:
   3. `GateExecutionResult` 모델이 status(PASS/WARN/BLOCK/WAIVER_REQUIRED), matched_rules, matched_issues, applicable_waivers, missing_waivers를 포함한다
   4. blocking rule이 존재하면 status가 BLOCK이 되고, waiver가 없는 issue는 WAIVER_REQUIRED가 된다
   5. 우선순위(BLOCK > WAIVER_REQUIRED > WARN > PASS) 집계가 올바르게 작동한다 — 단위 테스트로 검증
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1** *(병렬 실행 가능)*
+- [ ] 02-PLAN-01.md — Resolver Engine (ResolverResult 모델 + resolve() 함수 + 단위 테스트)
+- [ ] 02-PLAN-02.md — Gate Engine (GateExecutionResult 모델 + $-DSL + evaluate_gate() + 단위 테스트)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 02-PLAN-03.md — Phase 2 통합 테스트 + ROADMAP 업데이트
+
+Cross-cutting constraints:
+- 모든 Pydantic DTO: `ConfigDict(extra='forbid')` (CONTEXT.md D-05, D-07 준수)
+- DB 의존성 없음: resolve()와 evaluate_gate() 모두 순수 Python 함수 (RES-03)
 **UI hint**: no
 
 ---
