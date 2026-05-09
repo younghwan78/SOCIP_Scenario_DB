@@ -8,7 +8,7 @@ _Created: 2026-05-05_
 
 - [x] **Phase 1: DB Foundation** — ETL semantic validation + CanonicalScenarioGraph builder + repository 확장
 - [x] **Phase 2: Resolver & Gate Engine** — 비영속 Resolver + GateExecutionResult 엔진 (순수 Python)
-- [ ] **Phase 3: Runtime API** — /graph, /resolve, /gate 엔드포인트 + view router DB 연동
+- [x] **Phase 3: Runtime API** — /graph, /resolve, /gate 엔드포인트 + view router DB 연동
 - [ ] **Phase 4: Level 0 Viewer DB** — project_level0(db) 구현, topology mode, gate overlay
 - [ ] **Phase 5: Schema Extensions** — IpCatalog.sim_params + Variant.sim_port_config/sim_config + Usecase.sensor + SimulationEvidence 확장
 - [ ] **Phase 6: sim/ Package** — constants/models/bw_calc/perf_calc/power_calc/dvfs_resolver/adapter/runner
@@ -84,11 +84,11 @@ Cross-cutting constraints:
 **Plans**: 3 plans
 Plans:
 **Wave 1** *(병렬 실행 가능)*
-- [ ] 03-01-PLAN.md — Runtime API 라우터 (runtime.py 신규 + app.py 등록)
-- [ ] 03-02-PLAN.md — View Router 수정 (mode 분기 + sample fallback 제거)
+- [x] 03-01-PLAN.md — Runtime API 라우터 (runtime.py 신규 + app.py 등록)
+- [x] 03-02-PLAN.md — View Router 수정 (mode 분기 + sample fallback 제거)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 03-03-PLAN.md — 통합 테스트 작성 + 전체 테스트 통과 확인
+- [x] 03-03-PLAN.md — 통합 테스트 작성 + 전체 테스트 통과 확인
 
 Cross-cutting constraints:
 - 기존 `get_db` + `get_rule_cache` 의존성 패턴 재사용 (D-01)
@@ -167,7 +167,7 @@ Cross-cutting constraints:
 |-------|----------------|--------|-----------|
 | 1. DB Foundation | 3/3 | COMPLETE | 2026-05-07 |
 | 2. Resolver & Gate Engine | 3/3 | COMPLETE | 2026-05-09 |
-| 3. Runtime API | 0/3 | Planned | - |
+| 3. Runtime API | 3/3 | COMPLETE | 2026-05-10 |
 | 4. Level 0 Viewer DB | 0/3 | Not started | - |
 | 5. Schema Extensions | 0/3 | Not started | - |
 | 6. sim/ Package | 0/4 | Not started | - |

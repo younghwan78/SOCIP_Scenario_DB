@@ -2,8 +2,8 @@
 
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
-- **Current Phase**: Phase 3 — Runtime API
-- **Status**: Phase 3 planned (3 plans). Ready to execute.
+- **Current Phase**: Phase 4 — Level 0 Viewer DB
+- **Status**: Phase 3 complete (3/3 plans). Phase 4 not started.
 - **Last Updated**: 2026-05-10
 
 ---
@@ -11,10 +11,10 @@
 ## Current Position
 
 ```
-Milestone 1: Phase 1 ✓ → Phase 2 ✓ → [Phase 3] → Phase 4
+Milestone 1: Phase 1 ✓ → Phase 2 ✓ → Phase 3 ✓ → [Phase 4]
 Milestone 2: Phase 5 → Phase 6 → Phase 7
 
-Progress: ██████░░░░░░░░░░░░░░ 2 / 7 phases complete
+Progress: █████████░░░░░░░░░░░ 3 / 7 phases complete
 ```
 
 ## Phase Sequence
@@ -23,8 +23,8 @@ Progress: ██████░░░░░░░░░░░░░░ 2 / 7 pha
 |-------|------|-----------|------------|--------|
 | 1 | DB Foundation | M1 | — | COMPLETE (3/3 plans) |
 | 2 | Resolver & Gate Engine | M1 | Phase 1 | COMPLETE (3/3 plans) |
-| 3 | Runtime API | M1 | Phase 1, 2 | Ready to execute (3 plans) |
-| 4 | Level 0 Viewer DB | M1 | Phase 3 | Not started |
+| 3 | Runtime API | M1 | Phase 1, 2 | COMPLETE (3/3 plans) |
+| 4 | Level 0 Viewer DB | M1 | Phase 3 | Ready to start |
 | 5 | Schema Extensions | M2 | Phase 1, 4 | Not started |
 | 6 | sim/ Package | M2 | Phase 5 | Not started |
 | 7 | Simulation API | M2 | Phase 5, 6 | Not started |
@@ -49,8 +49,10 @@ Progress: ██████░░░░░░░░░░░░░░ 2 / 7 pha
 
 ### Existing Baseline
 
-- FastAPI 33 endpoints + 209 tests (all passing)
-- ELK Level 0 Viewer (hardcoded sample data — Phase 4에서 교체)
+- FastAPI 36 endpoints + 464 tests (313 unit + 159 integration, all passing)
+- Runtime API: /graph, /resolve, /gate 엔드포인트 (Phase 3 완료)
+- View Router: mode 분기 (architecture=DB projection, topology=501)
+- ELK Level 0 Viewer (sample data 제거 완료, Phase 4에서 ELK 레이아웃 구현)
 - Matcher DSL + RuleCache (Phase 2에서 재사용)
 - ETL YAML → DB (Phase 1에서 semantic validation 추가)
 
@@ -75,3 +77,4 @@ _Updated after each phase transition._
 - **Phase 3 start**: 2026-05-10
 - **Phase 3 context**: 2026-05-10 (`.planning/phases/03-runtime-api/03-CONTEXT.md`)
 - **Phase 3 planned**: 2026-05-10 — 3 plans (PLAN-01 Wave1: Runtime router, PLAN-02 Wave1: View router, PLAN-03 Wave2: Integration tests)
+- **Phase 3 end**: 2026-05-10 (3 plans complete — runtime.py router, view mode DB projection, 8 new integration tests, 159 total passing)
