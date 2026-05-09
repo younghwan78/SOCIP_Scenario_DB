@@ -32,7 +32,7 @@ def get_view(
     """
     try:
         if level == 0:
-            return project_level0(scenario_id, variant_id, db=db)
+            return project_level0(scenario_id, variant_id, mode=mode, db=db)
         if level == 1:
             return project_level1(scenario_id, variant_id, db=db)
         if level == 2:
