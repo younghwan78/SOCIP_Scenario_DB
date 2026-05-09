@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from functools import lru_cache
+
 from pydantic import Field
 from pydantic.aliases import AliasChoices
 from pydantic_settings import BaseSettings
@@ -20,11 +22,7 @@ class Settings(BaseSettings):
     model_config = {"env_prefix": "SCENARIO_DB_", "env_file": ".env", "extra": "ignore"}
 
 
-_settings: Settings | None = None
-
-
+@lru_cache(maxsize=None)
 def get_settings() -> Settings:
-    global _settings
-    if _settings is None:
-        _settings = Settings()
-    return _settings
+    """Settings 싱글톤 — lru_cache로 캐싱. 테스트 격리 시 get_settings.cache_clear() 사용."""
+    return Settings()
