@@ -230,29 +230,65 @@ def build_sample_level0() -> ViewResponse:
 # Projection helpers (stubs for DB-backed projection)
 # ---------------------------------------------------------------------------
 
-def project_level0(scenario_id: str, variant_id: str, db=None) -> ViewResponse:
-    """Project DB data into a Level 0 ViewResponse.
+def _projection_to_view_response(projection: dict) -> ViewResponse:
+    """get_view_projection() dict → 최소 ViewResponse 변환 (Phase 3 architecture mode).
 
-    Falls back to sample data when db is None (dashboard demo mode).
-    DB path queries via get_view_projection() Repository (Phase 1 wiring).
-    Full ELK layout construction from DB data is Phase 4 (VIEW-01).
+    위치(x/y)는 0.0으로 설정 — ELK 레이아웃은 Phase 4 VIEW-01 작업.
     """
-    if db is None:
-        return build_sample_level0()
+    nodes = [
+        NodeElement(
+            data=NodeData(
+                id=node["id"],
+                label=node.get("id", ""),
+                type="ip",
+                layer="hw",
+            ),
+            position={"x": 0.0, "y": 0.0},
+        )
+        for node in projection.get("pipeline", {}).get("nodes", [])
+    ]
+    summary = ViewSummary(
+        scenario_id=projection["scenario_id"],
+        variant_id=projection["variant_id"],
+        name=projection.get("project_name") or projection["scenario_id"],
+        subtitle="",
+        period_ms=0.0,
+        budget_ms=0.0,
+        resolution="",
+        fps=0,
+        variant_label="",
+    )
+    return ViewResponse(
+        level=0,
+        mode="architecture",
+        scenario_id=projection["scenario_id"],
+        variant_id=projection["variant_id"],
+        nodes=nodes,
+        edges=[],
+        risks=[],
+        summary=summary,
+    )
+
+
+def project_level0(scenario_id: str, variant_id: str, *, mode: str = "architecture", db: "Session") -> ViewResponse:
+    """Level 0 view — DB projection 기반 (Phase 3, D-06).
+
+    mode='architecture': get_view_projection() 결과를 NodeElement 리스트로 변환.
+    mode='topology': NotImplementedError (Phase 4 VIEW-03 작업).
+    db는 view.py 라우터에서 항상 Session 객체로 전달된다 (D-06: db=None 분기 없음).
+    """
+    if mode not in ("architecture", "topology"):
+        raise NotImplementedError(f"mode '{mode}' is not supported")
+    if mode == "topology":
+        raise NotImplementedError("topology mode is Phase 4 work")
 
     from scenario_db.db.repositories.view_projection import get_view_projection
+    from sqlalchemy.exc import NoResultFound
     projection = get_view_projection(db, scenario_id, variant_id)
     if projection is None:
-        from scenario_db.api.exceptions import NotFoundError
-        raise NotFoundError(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
+        raise NoResultFound(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
 
-    # NOTE: Until Phase 4 (VIEW-01), this returns demo layout with DB-sourced IDs.
-    # Full ELK projection from DB data is VIEW-01 work.
-    # projection["lanes"] / projection["ip_catalog"] are available but not yet consumed.
-    response = build_sample_level0()
-    return ViewResponse(
-        **{**response.model_dump(), "scenario_id": scenario_id, "variant_id": variant_id},
-    )
+    return _projection_to_view_response(projection)
 
 
 def project_level1(scenario_id: str, variant_id: str, db=None) -> ViewResponse:
