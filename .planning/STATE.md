@@ -2,19 +2,19 @@
 
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
-- **Current Phase**: Phase 2 — Resolver & Gate Engine
-- **Status**: Phase 2 context gathered. Ready for planning.
-- **Last Updated**: 2026-05-08
+- **Current Phase**: Phase 3 — Runtime API
+- **Status**: Phase 3 planned (3 plans). Ready to execute.
+- **Last Updated**: 2026-05-10
 
 ---
 
 ## Current Position
 
 ```
-Milestone 1: Phase 1 ✓ → [Phase 2] → Phase 3 → Phase 4
+Milestone 1: Phase 1 ✓ → Phase 2 ✓ → [Phase 3] → Phase 4
 Milestone 2: Phase 5 → Phase 6 → Phase 7
 
-Progress: ███░░░░░░░░░░░░░░░░░ 1 / 7 phases complete
+Progress: ██████░░░░░░░░░░░░░░ 2 / 7 phases complete
 ```
 
 ## Phase Sequence
@@ -22,8 +22,8 @@ Progress: ███░░░░░░░░░░░░░░░░░ 1 / 7 pha
 | Phase | Name | Milestone | Depends On | Status |
 |-------|------|-----------|------------|--------|
 | 1 | DB Foundation | M1 | — | COMPLETE (3/3 plans) |
-| 2 | Resolver & Gate Engine | M1 | Phase 1 | Context gathered — Ready to plan |
-| 3 | Runtime API | M1 | Phase 1, 2 | Not started |
+| 2 | Resolver & Gate Engine | M1 | Phase 1 | COMPLETE (3/3 plans) |
+| 3 | Runtime API | M1 | Phase 1, 2 | Ready to execute (3 plans) |
 | 4 | Level 0 Viewer DB | M1 | Phase 3 | Not started |
 | 5 | Schema Extensions | M2 | Phase 1, 4 | Not started |
 | 6 | sim/ Package | M2 | Phase 5 | Not started |
@@ -70,3 +70,8 @@ _Updated after each phase transition._
 - **Phase 1 end**: 2026-05-07 (3 plans complete — validate_loaded, CanonicalScenarioGraph, view_projection + integration tests)
 - **Phase 2 start**: 2026-05-08
 - **Phase 2 context**: 2026-05-08 (`.planning/phases/02-resolver-gate-engine/02-CONTEXT.md`)
+- **Phase 2 planned**: 2026-05-09 — 3 plans (PLAN-01 Wave1: Resolver, PLAN-02 Wave1: Gate, PLAN-03 Wave2: Integration)
+- **Phase 2 end**: 2026-05-09 (3 plans complete — ResolverResult, GateExecutionResult, 56 tests passing)
+- **Phase 3 start**: 2026-05-10
+- **Phase 3 context**: 2026-05-10 (`.planning/phases/03-runtime-api/03-CONTEXT.md`)
+- **Phase 3 planned**: 2026-05-10 — 3 plans (PLAN-01 Wave1: Runtime router, PLAN-02 Wave1: View router, PLAN-03 Wave2: Integration tests)
