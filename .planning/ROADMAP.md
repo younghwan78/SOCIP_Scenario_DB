@@ -81,7 +81,18 @@ Cross-cutting constraints:
   3. `GET /api/v1/scenarios/{id}/variants/{vid}/gate` 가 GateExecutionResult JSON을 반환한다
   4. view router의 `mode` 파라미터(architecture|topology)가 실제로 분기되고, sample fallback 코드 경로가 제거된다
   5. 기존 209개 테스트가 모두 통과하고, 신규 3개 엔드포인트에 대한 통합 테스트가 추가된다
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1** *(병렬 실행 가능)*
+- [ ] 03-01-PLAN.md — Runtime API 라우터 (runtime.py 신규 + app.py 등록)
+- [ ] 03-02-PLAN.md — View Router 수정 (mode 분기 + sample fallback 제거)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 03-03-PLAN.md — 통합 테스트 작성 + 전체 테스트 통과 확인
+
+Cross-cutting constraints:
+- 기존 `get_db` + `get_rule_cache` 의존성 패턴 재사용 (D-01)
+- response_model로 Phase 1/2 DTO 직접 사용 (D-02, D-03, D-04)
 **UI hint**: no
 
 ---
@@ -156,7 +167,7 @@ Cross-cutting constraints:
 |-------|----------------|--------|-----------|
 | 1. DB Foundation | 3/3 | COMPLETE | 2026-05-07 |
 | 2. Resolver & Gate Engine | 3/3 | COMPLETE | 2026-05-09 |
-| 3. Runtime API | 0/3 | Not started | - |
+| 3. Runtime API | 0/3 | Planned | - |
 | 4. Level 0 Viewer DB | 0/3 | Not started | - |
 | 5. Schema Extensions | 0/3 | Not started | - |
 | 6. sim/ Package | 0/4 | Not started | - |
