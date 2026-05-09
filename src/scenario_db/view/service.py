@@ -235,18 +235,32 @@ def _projection_to_view_response(projection: dict) -> ViewResponse:
 
     위치(x/y)는 0.0으로 설정 — ELK 레이아웃은 Phase 4 VIEW-01 작업.
     """
-    nodes = [
-        NodeElement(
-            data=NodeData(
-                id=node["id"],
-                label=node.get("id", ""),
-                type="ip",
-                layer="hw",
-            ),
-            position={"x": 0.0, "y": 0.0},
+    _valid_node_types = {
+        "sw", "ip", "submodule", "buffer", "dma_group", "dma_channel",
+        "sysmmu", "lane_bg", "lane_label", "stage_header",
+    }
+    _valid_layers = {"app", "framework", "hal", "kernel", "hw", "memory", "meta"}
+
+    nodes = []
+    for node in projection.get("pipeline", {}).get("nodes", []):
+        node_id = node.get("id")
+        if not node_id:
+            continue
+        node_type_raw = node.get("type", "ip")
+        node_type = node_type_raw if node_type_raw in _valid_node_types else "ip"
+        node_layer_raw = node.get("layer", "hw")
+        node_layer = node_layer_raw if node_layer_raw in _valid_layers else "hw"
+        nodes.append(
+            NodeElement(
+                data=NodeData(
+                    id=node_id,
+                    label=node.get("label", node_id),
+                    type=node_type,
+                    layer=node_layer,
+                ),
+                position={"x": 0.0, "y": 0.0},
+            )
         )
-        for node in projection.get("pipeline", {}).get("nodes", [])
-    ]
     summary = ViewSummary(
         scenario_id=projection["scenario_id"],
         variant_id=projection["variant_id"],
