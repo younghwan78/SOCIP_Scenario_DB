@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.exc import NoResultFound
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from scenario_db.api.cache import RuleCache
@@ -30,7 +29,10 @@ def get_graph(
     """CanonicalScenarioGraph DTO 반환 — DB에서 scenario 전체 그래프 조회."""
     graph = get_canonical_graph(db, scenario_id, variant_id)
     if graph is None:
-        raise NoResultFound(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
+        raise HTTPException(
+            status_code=404,
+            detail=f"scenario '{scenario_id}' / variant '{variant_id}' not found",
+        )
     return graph
 
 
@@ -46,7 +48,10 @@ def get_resolve(
     """Resolver 실행 결과 반환 — variant.ip_requirements → ip_catalog.capabilities 매핑."""
     graph = get_canonical_graph(db, scenario_id, variant_id)
     if graph is None:
-        raise NoResultFound(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
+        raise HTTPException(
+            status_code=404,
+            detail=f"scenario '{scenario_id}' / variant '{variant_id}' not found",
+        )
     return resolve(graph)
 
 
@@ -66,5 +71,8 @@ def get_gate(
     """
     graph = get_canonical_graph(db, scenario_id, variant_id)
     if graph is None:
-        raise NoResultFound(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
+        raise HTTPException(
+            status_code=404,
+            detail=f"scenario '{scenario_id}' / variant '{variant_id}' not found",
+        )
     return evaluate_gate(graph, cache.gate_rules)
