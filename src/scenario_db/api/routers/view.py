@@ -1,6 +1,8 @@
 """FastAPI view router — GET /api/v1/scenarios/{sid}/variants/{vid}/view."""
 from __future__ import annotations
 
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -20,7 +22,7 @@ def get_view(
     scenario_id: str,
     variant_id: str,
     level: int = Query(0, ge=0, le=2, description="View depth: 0=lane, 1=IP DAG, 2=drill-down"),
-    mode: str = Query("architecture", description="architecture | topology"),
+    mode: Literal["architecture", "topology"] = Query("architecture", description="architecture | topology"),
     expand: str | None = Query(None, description="IP id to expand (Level 2 only)"),
     db: Session = Depends(get_db),
 ):
