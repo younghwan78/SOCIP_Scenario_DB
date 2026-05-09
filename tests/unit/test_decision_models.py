@@ -252,7 +252,7 @@ def test_issue_status_enum():
 
 
 def test_gate_result_status_enum():
-    assert set(GateResultStatus) == {"PASS", "WARN", "BLOCK"}
+    assert set(GateResultStatus) == {"PASS", "WARN", "BLOCK", "WAIVER_REQUIRED"}
 
 
 # ---------------------------------------------------------------------------

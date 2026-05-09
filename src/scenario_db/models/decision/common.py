@@ -125,3 +125,4 @@ class GateResultStatus(StrEnum):
     PASS = "PASS"
     WARN = "WARN"
     BLOCK = "BLOCK"
+    WAIVER_REQUIRED = "WAIVER_REQUIRED"
