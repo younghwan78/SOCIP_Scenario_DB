@@ -436,10 +436,13 @@ def project_level0(scenario_id: str, variant_id: str, *, mode: str = "architectu
         return build_sample_level0()
 
     from scenario_db.db.repositories.view_projection import get_view_projection
-    from sqlalchemy.exc import NoResultFound
+    from fastapi import HTTPException
     projection = get_view_projection(db, scenario_id, variant_id)
     if projection is None:
-        raise NoResultFound(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
+        raise HTTPException(
+            status_code=404,
+            detail=f"scenario '{scenario_id}' / variant '{variant_id}' not found",
+        )
 
     if mode == "architecture":
         return _projection_to_view_response(projection)
