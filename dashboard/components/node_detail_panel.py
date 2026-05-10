@@ -1,4 +1,4 @@
-"""Right inspector panel — scenario summary, risk cards, notes."""
+"""Right inspector panel — scenario summary, risk cards, notes, gate inspector."""
 from __future__ import annotations
 
 import streamlit as st
@@ -107,3 +107,104 @@ def render_inspector(view: ViewResponse) -> None:
             )
         else:
             st.markdown("</div>", unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------------------
+# Gate inspector (VIEW-04 — GateExecutionResult 표시)
+# ---------------------------------------------------------------------------
+
+# Gate status badge 색상 (D-06: PASS/WARN/BLOCK/WAIVER_REQUIRED 구분)
+_GATE_STATUS_STYLE: dict[str, dict[str, str]] = {
+    "PASS":            {"border": "#D1D5DB", "bg": "#F9FAFB", "text": "#374151"},
+    "WARN":            {"border": "#F59E0B", "bg": "#FFFBEB", "text": "#92400E"},
+    "BLOCK":           {"border": "#EF4444", "bg": "#FEF2F2", "text": "#991B1B"},
+    "WAIVER_REQUIRED": {"border": "#8B5CF6", "bg": "#F5F3FF", "text": "#5B21B6"},
+}
+
+
+def render_gate_inspector(gate) -> None:
+    """Gate 실행 결과를 인스펙터 패널에 표시 (status badge + matched_rules risk card).
+
+    VIEW-04: GateExecutionResult를 인스펙터 패널 + risk card로 표시.
+    gate: GateExecutionResult (import 지연 — circular import 방지)
+    """
+    from scenario_db.gate.models import GateExecutionResult  # noqa: F401 (type hint용)
+
+    status_str = str(gate.status)   # GateResultStatus는 StrEnum → str() 사용
+    style = _GATE_STATUS_STYLE.get(status_str, _GATE_STATUS_STYLE["PASS"])
+
+    # ── Status badge ──────────────────────────────────────────────────────
+    st.markdown(
+        '<p style="font-size:10px;font-weight:700;color:#9CA3AF;'
+        'letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">'
+        'GATE STATUS</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div style="border:2px solid {style["border"]};background:{style["bg"]};'
+        f'border-radius:8px;padding:8px 12px;margin-bottom:10px;">'
+        f'<span style="font-size:14px;font-weight:700;color:{style["text"]};">'
+        f'{status_str}</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Matched issues (issue id 목록) ────────────────────────────────────
+    if gate.matched_issues:
+        st.markdown(
+            '<p style="font-size:10px;font-weight:700;color:#9CA3AF;'
+            'letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">'
+            'MATCHED ISSUES</p>',
+            unsafe_allow_html=True,
+        )
+        issues_html = "".join(
+            f'<span style="display:inline-block;background:#FEE2E2;color:#991B1B;'
+            f'border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;'
+            f'margin:0 4px 4px 0;">{iss}</span>'
+            for iss in gate.matched_issues
+        )
+        st.markdown(
+            f'<div style="margin-bottom:10px;">{issues_html}</div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── Missing waivers ───────────────────────────────────────────────────
+    if gate.missing_waivers:
+        st.markdown(
+            '<p style="font-size:10px;font-weight:700;color:#9CA3AF;'
+            'letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">'
+            'MISSING WAIVERS</p>',
+            unsafe_allow_html=True,
+        )
+        waivers_html = "".join(
+            f'<span style="display:inline-block;background:#F5F3FF;color:#5B21B6;'
+            f'border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;'
+            f'margin:0 4px 4px 0;">{w}</span>'
+            for w in gate.missing_waivers
+        )
+        st.markdown(
+            f'<div style="margin-bottom:10px;">{waivers_html}</div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── Matched rules (risk card style) ──────────────────────────────────
+    if gate.matched_rules:
+        st.markdown(
+            f'<p style="font-size:10px;font-weight:700;color:#9CA3AF;'
+            f'letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">'
+            f'MATCHED RULES ({len(gate.matched_rules)})</p>',
+            unsafe_allow_html=True,
+        )
+        for rule_match in gate.matched_rules:
+            rule_status = str(rule_match.result)
+            rule_style = _GATE_STATUS_STYLE.get(rule_status, _GATE_STATUS_STYLE["PASS"])
+            msg = rule_match.message or ""
+            st.markdown(
+                f'<div style="background:white;border:1px solid #E5E7EB;border-radius:8px;'
+                f'padding:8px 10px;margin-bottom:6px;'
+                f'border-left:3px solid {rule_style["border"]};">'
+                f'<div style="font-size:11px;font-weight:700;color:#111827;">'
+                f'{rule_match.rule_id}</div>'
+                f'<div style="font-size:10px;color:#6B7280;margin-top:2px;">{msg}</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )

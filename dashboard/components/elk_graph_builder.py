@@ -57,8 +57,13 @@ def build_elk_graph(
     view: ViewResponse,
     visible_layers: list[str] | None = None,
     visible_edge_types: list[str] | None = None,
+    gate_styles: dict[str, str] | None = None,
 ) -> tuple[dict, dict]:
-    """Return (elk_graph, meta) ready for JSON serialisation and template injection."""
+    """Return (elk_graph, meta) ready for JSON serialisation and template injection.
+
+    gate_styles: {"__global__": "WARN"|"BLOCK"|"PASS"|"WAIVER_REQUIRED"} or None.
+    When provided, applies border/warning override to ip-type nodes (D-06).
+    """
     vis_layers = set(visible_layers) if visible_layers is not None else set(LANE_ORDER)
     vis_etypes = set(visible_edge_types) if visible_edge_types is not None else set(EDGE_COLOR)
 
@@ -118,8 +123,24 @@ def build_elk_graph(
         "edges": elk_edges,
     }
 
-    meta = _build_meta(view, visible_node_ids, vis_etypes, vis_layers)
+    meta = _build_meta(view, visible_node_ids, vis_etypes, vis_layers, gate_styles=gate_styles)
     return elk_graph, meta
+
+
+# Alias for backward compatibility
+def build_view_layout(
+    view: ViewResponse,
+    visible_layers: list[str] | None = None,
+    visible_edge_types: list[str] | None = None,
+    gate_styles: dict[str, str] | None = None,
+) -> tuple[dict, dict]:
+    """Alias for build_elk_graph() — backward-compat name used by elk_viewer.py."""
+    return build_elk_graph(
+        view,
+        visible_layers=visible_layers,
+        visible_edge_types=visible_edge_types,
+        gate_styles=gate_styles,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -175,11 +196,21 @@ def _build_edge_label(ed: EdgeData) -> str:
 # Meta dict builder
 # ---------------------------------------------------------------------------
 
+# Gate status → node border 색상 오버라이드 (D-06)
+GATE_BORDER: dict[str, str] = {
+    "PASS":             "#D1D5DB",   # 기본 회색 (변화 없음)
+    "WARN":             "#F59E0B",   # 노란색 테두리
+    "BLOCK":            "#EF4444",   # 빨간색 테두리
+    "WAIVER_REQUIRED":  "#8B5CF6",   # 보라색 테두리
+}
+
+
 def _build_meta(
     view: ViewResponse,
     visible_node_ids: set[str],
     vis_etypes: set[str],
     vis_layers: set[str],
+    gate_styles: dict[str, str] | None = None,
 ) -> dict:
     meta: dict = {}
 
@@ -248,6 +279,18 @@ def _build_meta(
             detail["issues"] = d.matched_issues
         entry["detail"] = detail
         meta[d.id] = entry
+
+    # Gate status 색상 오버라이드 (D-06)
+    # gate_styles = {"__global__": "WARN"|"BLOCK"|"PASS"|"WAIVER_REQUIRED"}
+    if gate_styles:
+        global_status = gate_styles.get("__global__")
+        if global_status and global_status in GATE_BORDER:
+            gate_border_color = GATE_BORDER[global_status]
+            for nid, entry in meta.items():
+                if entry.get("type") == "ip":   # HW IP 노드에만 적용
+                    entry["border"] = gate_border_color
+                    if global_status in ("WARN", "BLOCK", "WAIVER_REQUIRED"):
+                        entry["warning"] = True
 
     # Edge meta
     for ee in view.edges:

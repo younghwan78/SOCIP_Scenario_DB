@@ -64,12 +64,15 @@ def test_view_architecture_mode(api_client: TestClient):
     assert "nodes" in data
 
 
-def test_view_topology_mode_returns_501(api_client: TestClient):
+def test_view_topology_mode_returns_200(api_client: TestClient):
+    """topology mode가 04-03 구현 완료 후 200을 반환한다 (이전 501 → 200으로 업데이트)."""
     resp = api_client.get(
         f"/api/v1/scenarios/{SCENARIO_ID}/variants/{VARIANT_ID}/view",
         params={"level": 0, "mode": "topology"},
     )
-    assert resp.status_code == 501
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["mode"] == "topology"
 
 
 def test_view_architecture_404(api_client: TestClient):

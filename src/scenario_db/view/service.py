@@ -340,17 +340,97 @@ def _projection_to_view_response(projection: dict) -> ViewResponse:
     )
 
 
+def _sw_stack_to_view_response(projection: dict) -> ViewResponse:
+    """topology mode: sw_stack 섹션 → SW 노드 + SW→HW control edges + HW 노드.
+
+    VIEW-03: SW task/thread 레이어 중심 레이아웃.
+    - projection["pipeline"]["sw_stack"] → SW 노드 (layer in app/framework/hal/kernel)
+    - ip_ref 있는 SW 노드 → HW 노드로 control 엣지 생성
+    - HW 노드는 _projection_to_view_response()에서 재사용 (architecture mode 동일 좌표)
+    """
+    pipeline = projection.get("pipeline", {})
+    sw_stack_raw = pipeline.get("sw_stack", [])
+
+    # 레이어별 X 시작좌표 (같은 레이어 내 노드들을 X_STEP 간격으로 배치)
+    X_START = LANE_LABEL_W + STAGE_STEP // 2  # 235px
+    X_STEP = 180  # 같은 레이어 내 노드 간 간격
+
+    layer_x_counter: dict[str, int] = {}  # 레이어별 노드 누적 인덱스
+
+    sw_nodes: list[NodeElement] = []
+    sw_node_ids: set[str] = set()
+
+    for sw in sw_stack_raw:
+        layer = sw.get("layer", "app")
+        nid = sw.get("id", "")
+        label = sw.get("label", nid)
+        if not nid:
+            continue
+        idx = layer_x_counter.get(layer, 0)
+        x = float(X_START + idx * X_STEP)
+        y = LANE_Y[layer]
+        layer_x_counter[layer] = idx + 1
+        sw_node_ids.add(nid)
+        sw_nodes.append(NodeElement(
+            data=NodeData(id=nid, label=label, type="sw", layer=layer),
+            position={"x": x, "y": y},
+        ))
+
+    # HW 노드 (architecture mode와 동일한 좌표) — topology에서도 표시
+    hw_view = _projection_to_view_response(projection)
+    hw_node_ids = {n.data.id for n in hw_view.nodes}
+
+    # SW→HW control edges (ip_ref 있는 sw_stack 노드만)
+    sw_hw_edges: list[EdgeElement] = []
+    for sw in sw_stack_raw:
+        nid = sw.get("id", "")
+        ip_ref = sw.get("ip_ref")  # pipeline node id (e.g., "csis0", "mfc")
+        if ip_ref and ip_ref in hw_node_ids:
+            edge_id = f"e-sw-{nid}-{ip_ref}"
+            sw_hw_edges.append(EdgeElement(data=EdgeData(
+                id=edge_id,
+                source=nid,
+                target=ip_ref,
+                flow_type="control",  # Literal 제약: "OTF"/"vOTF"/"M2M"/"control"/"risk"
+            )))
+
+    # 노드/엣지 합산: SW + HW, SW→HW + HW→HW
+    all_nodes = sw_nodes + hw_view.nodes
+    all_edges = sw_hw_edges + hw_view.edges
+
+    summary = ViewSummary(
+        scenario_id=projection.get("scenario_id", ""),
+        variant_id=projection.get("variant_id", ""),
+        name=projection.get("project_name") or projection.get("scenario_id", ""),
+        subtitle="topology mode",
+        period_ms=0.0,
+        budget_ms=0.0,
+        resolution="",
+        fps=0,
+        variant_label="",
+    )
+
+    return ViewResponse(
+        level=0,
+        mode="topology",
+        scenario_id=projection.get("scenario_id", ""),
+        variant_id=projection.get("variant_id", ""),
+        nodes=all_nodes,
+        edges=all_edges,
+        risks=[],
+        summary=summary,
+    )
+
+
 def project_level0(scenario_id: str, variant_id: str, *, mode: str = "architecture", db=None) -> ViewResponse:
     """Level 0 view — DB projection 기반 (Phase 4 D-01).
 
     mode='architecture': get_view_projection() 결과를 실좌표 NodeElement 리스트로 변환.
-    mode='topology': NotImplementedError (Phase 4 VIEW-03, 04-PLAN-03 작업).
+    mode='topology': sw_stack 기반 SW 노드 + SW→HW control edge 생성 (VIEW-03).
     db=None: dashboard demo 모드 — sample data fallback.
     """
     if mode not in ("architecture", "topology"):
         raise NotImplementedError(f"mode '{mode}' is not supported")
-    if mode == "topology":
-        raise NotImplementedError("topology mode: implemented in 04-PLAN-03")
 
     if db is None:
         return build_sample_level0()
@@ -361,7 +441,10 @@ def project_level0(scenario_id: str, variant_id: str, *, mode: str = "architectu
     if projection is None:
         raise NoResultFound(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
 
-    return _projection_to_view_response(projection)
+    if mode == "architecture":
+        return _projection_to_view_response(projection)
+    else:  # topology
+        return _sw_stack_to_view_response(projection)
 
 
 def project_level1(scenario_id: str, variant_id: str, db=None) -> ViewResponse:
