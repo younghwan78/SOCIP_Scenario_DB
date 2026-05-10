@@ -50,3 +50,10 @@ def test_sw_stack_invalid_layer_raises():
     import pydantic
     with pytest.raises(pydantic.ValidationError):
         SwStackNode(layer="hw", id="bad", label="Bad Node")
+
+
+def test_sw_stack_node_rejects_extra_fields():
+    """SwStackNode는 extra='forbid' 이므로 미지의 필드를 거부한다 (IN-03)."""
+    import pydantic
+    with pytest.raises(pydantic.ValidationError):
+        SwStackNode(layer="hal", id="x", label="X", unknown_field="oops")
