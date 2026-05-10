@@ -11,6 +11,13 @@ pytestmark = pytest.mark.integration
 
 # uc-camera-recording 시나리오의 실제 variant id
 # (tests/integration/test_view_projection.py와 동일)
+#
+# WR-06: VARIANT_ID is hard-coded here and must match the demo ETL fixture
+# (data/fixtures/demo/uc-camera-recording.yaml → variants[*].id).
+# If the fixture YAML changes this id, all tests below will return 404.
+# Future improvement: dynamically discover the variant id via
+#   GET /api/v1/scenarios/{SCENARIO_ID}/variants
+# in a conftest fixture so tests are resilient to fixture renaming.
 SCENARIO_ID = "uc-camera-recording"
 VARIANT_ID = "UHD60-HDR10-H265"
 

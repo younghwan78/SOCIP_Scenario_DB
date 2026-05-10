@@ -4,6 +4,10 @@ from fastapi.testclient import TestClient
 
 pytestmark = pytest.mark.integration
 
+# WR-06: VARIANT_ID is hard-coded and must match the demo ETL fixture
+# (data/fixtures/demo/uc-camera-recording.yaml → variants[*].id).
+# Future improvement: discover this id dynamically via a conftest fixture
+# that calls GET /api/v1/scenarios/{SCENARIO_ID}/variants after ETL.
 SCENARIO_ID = "uc-camera-recording"
 VARIANT_ID = "UHD60-HDR10-H265"
 BASE = f"/api/v1/scenarios/{SCENARIO_ID}/variants/{VARIANT_ID}"
