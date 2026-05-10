@@ -223,18 +223,145 @@ def build_sample_level0() -> ViewResponse:
 
 
 # ---------------------------------------------------------------------------
-# Projection helpers (stubs for DB-backed projection)
+# Architecture mode — DB projection → 실좌표 ViewResponse (Phase 4 VIEW-01/02)
 # ---------------------------------------------------------------------------
 
-def project_level0(scenario_id: str, variant_id: str, db=None) -> ViewResponse:
-    """Project DB data into a Level 0 ViewResponse.
+import graphlib
 
-    Falls back to sample data when db is None (dashboard demo mode).
+# ip_catalog.category → lane 매핑 (RESEARCH.md Pattern 1 — fixture 직접 검증)
+CATEGORY_TO_LANE: dict[str, str] = {
+    "camera":  "hw",   # CSIS, ISP (ip-csis-v8, ip-isp-v12)
+    "codec":   "hw",   # MFC (ip-mfc-v14)
+    "display": "hw",   # DPU (ip-dpu-v9)
+    "memory":  "hw",   # LLC (ip-llc-v2)
+}
+
+STAGE_STEP: int = 310  # px per stage level (capture→processing 간격 기반)
+
+
+def _projection_to_view_response(projection: dict) -> ViewResponse:
+    """get_view_projection() dict → 실좌표 ViewResponse (architecture mode).
+
+    1. ip_catalog lookup: ip_ref → category → lane
+    2. graphlib.TopologicalSorter로 stage_index 계산
+    3. LANE_Y[lane] for y, LANE_LABEL_W + stage_idx * STAGE_STEP + offset for x
+    4. pipeline edges → EdgeElement 변환
     """
+    pipeline = projection.get("pipeline", {})
+    nodes_raw = pipeline.get("nodes", [])
+    edges_raw = pipeline.get("edges", [])
+
+    # ip_catalog lookup dict: {ip_id: ip_dict}
+    ip_catalog: dict[str, dict] = {
+        ip["id"]: ip for ip in projection.get("ip_catalog", [])
+    }
+
+    # --- topological sort (graphlib) ---
+    ts = graphlib.TopologicalSorter()
+    node_ids = {n["id"] for n in nodes_raw}
+    for n in nodes_raw:
+        ts.add(n["id"])
+    for e in edges_raw:
+        src, tgt = e.get("from"), e.get("to")
+        # self-loop 및 미등록 노드 방지
+        if src and tgt and src != tgt and src in node_ids and tgt in node_ids:
+            ts.add(tgt, src)  # tgt depends on src
+
+    ts.prepare()
+    stage_map: dict[str, int] = {}
+    stage_idx = 0
+    while ts.is_active():
+        batch = list(ts.get_ready())
+        for nid in batch:
+            stage_map[nid] = stage_idx
+        ts.done(*batch)
+        stage_idx += 1
+
+    # --- 노드 좌표 계산 ---
+    nodes: list[NodeElement] = []
+    for node in nodes_raw:
+        nid = node.get("id")
+        if not nid:
+            continue
+        ip_ref = node.get("ip_ref", "")
+        ip_info = ip_catalog.get(ip_ref, {})
+        category = ip_info.get("category", "")
+        lane = CATEGORY_TO_LANE.get(category, "hw")
+        s_idx = stage_map.get(nid, 0)
+        x = float(LANE_LABEL_W + s_idx * STAGE_STEP + STAGE_STEP // 2)
+        y = LANE_Y[lane]
+        nodes.append(NodeElement(
+            data=NodeData(
+                id=nid,
+                label=node.get("label", nid),
+                type="ip",
+                layer=lane,
+            ),
+            position={"x": x, "y": y},
+        ))
+
+    # --- 엣지 변환 ---
+    _valid_flow_types = {"OTF", "vOTF", "M2M", "control", "risk"}
+    edges: list[EdgeElement] = []
+    for e in edges_raw:
+        src = e.get("from")
+        tgt = e.get("to")
+        if not src or not tgt:
+            continue
+        etype = e.get("type", "M2M")
+        flow_type = etype if etype in _valid_flow_types else "M2M"
+        edge_id = f"e-{src}-{tgt}"
+        edges.append(EdgeElement(data=EdgeData(
+            id=edge_id, source=src, target=tgt, flow_type=flow_type,
+        )))
+
+    # --- ViewSummary (placeholder — Wave 2에서 보완) ---
+    summary = ViewSummary(
+        scenario_id=projection.get("scenario_id", ""),
+        variant_id=projection.get("variant_id", ""),
+        name=projection.get("project_name") or projection.get("scenario_id", ""),
+        subtitle="",
+        period_ms=0.0,
+        budget_ms=0.0,
+        resolution="",
+        fps=0,
+        variant_label="",
+    )
+
+    return ViewResponse(
+        level=0,
+        mode="architecture",
+        scenario_id=projection.get("scenario_id", ""),
+        variant_id=projection.get("variant_id", ""),
+        nodes=nodes,
+        edges=edges,
+        risks=[],
+        summary=summary,
+    )
+
+
+def project_level0(scenario_id: str, variant_id: str, *, mode: str = "architecture", db=None) -> ViewResponse:
+    """Level 0 view — DB projection 기반 (Phase 4 D-01).
+
+    mode='architecture': get_view_projection() 결과를 실좌표 NodeElement 리스트로 변환.
+    mode='topology': NotImplementedError (Phase 4 VIEW-03, 04-PLAN-03 작업).
+    db=None: dashboard demo 모드 — sample data fallback.
+    """
+    if mode not in ("architecture", "topology"):
+        raise NotImplementedError(f"mode '{mode}' is not supported")
+    if mode == "topology":
+        raise NotImplementedError("topology mode: implemented in 04-PLAN-03")
+
     if db is None:
         return build_sample_level0()
-    # TODO: query DB → assemble canonical graph → project to Level 0
-    raise NotImplementedError("DB-backed Level 0 projection is Phase C work")
+
+    from scenario_db.db.repositories.view_projection import get_view_projection
+    from sqlalchemy.exc import NoResultFound
+    projection = get_view_projection(db, scenario_id, variant_id)
+    if projection is None:
+        raise NoResultFound(f"scenario '{scenario_id}' / variant '{variant_id}' not found")
+
+    return _projection_to_view_response(projection)
 
 
 def project_level1(scenario_id: str, variant_id: str, db=None) -> ViewResponse:
