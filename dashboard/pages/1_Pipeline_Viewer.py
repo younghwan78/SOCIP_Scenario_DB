@@ -7,6 +7,7 @@ Run:
 from __future__ import annotations
 
 import sys
+import urllib.parse
 from pathlib import Path
 
 # Make src/ importable when running from project root
@@ -28,6 +29,21 @@ st.set_page_config(
 from scenario_db.api.schemas.view import ViewResponse
 from dashboard.components.elk_viewer import render_level0
 from dashboard.components.node_detail_panel import render_inspector
+
+
+# ── URL validation (SSRF guard) ───────────────────────────────────────────
+_ALLOWED_SCHEMES = {"http", "https"}
+_ALLOWED_HOSTS = {"localhost", "127.0.0.1"}   # 필요 시 prod 호스트 추가
+
+
+def _validate_api_url(url: str) -> str:
+    """scheme + hostname allow-list 검증. 통과하면 trailing slash 제거된 URL 반환."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in _ALLOWED_SCHEMES:
+        raise ValueError(f"Scheme '{parsed.scheme}' not allowed")
+    if parsed.hostname not in _ALLOWED_HOSTS:
+        raise ValueError(f"Host '{parsed.hostname}' not in allow-list")
+    return url.rstrip("/")
 
 
 # ── Global CSS ────────────────────────────────────────────────────────────
@@ -156,11 +172,16 @@ with st.sidebar:
 
     # API URL 설정 (D-02)
     st.markdown("**API Server**")
-    api_url = st.text_input(
+    raw_url = st.text_input(
         "Base URL",
         value=st.session_state.get("api_url", "http://localhost:8000"),
         label_visibility="collapsed",
     )
+    try:
+        api_url = _validate_api_url(raw_url)
+    except ValueError as e:
+        st.sidebar.error(str(e))
+        st.stop()
     if api_url != st.session_state.get("api_url"):
         st.session_state["api_url"] = api_url
         st.cache_data.clear()
