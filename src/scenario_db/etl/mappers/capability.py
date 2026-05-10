@@ -34,6 +34,7 @@ def upsert_ip(raw: dict, sha256: str, session: Session) -> None:
     row.capabilities   = obj.capabilities.model_dump(exclude_none=True) if obj.capabilities else None
     row.rtl_version    = obj.rtl_version
     row.compatible_soc = list(obj.compatible_soc)
+    row.sim_params     = obj.sim_params.model_dump(exclude_none=True) if obj.sim_params else None
     row.yaml_sha256    = sha256
     session.add(row)
 

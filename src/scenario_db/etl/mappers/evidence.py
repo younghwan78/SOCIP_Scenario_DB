@@ -31,6 +31,8 @@ def upsert_simulation(raw: dict, sha256: str, session: Session) -> None:
     row.run_info            = obj.run.model_dump(exclude_none=True)
     row.ip_breakdown        = [b.model_dump(exclude_none=True) for b in obj.ip_breakdown]
     row.artifacts           = [a.model_dump(exclude_none=True) for a in obj.artifacts]
+    row.dma_breakdown       = [b.model_dump(exclude_none=True) for b in obj.dma_breakdown]
+    row.timing_breakdown    = [t.model_dump(exclude_none=True) for t in obj.timing_breakdown]
     row.yaml_sha256         = sha256
     session.add(row)
 

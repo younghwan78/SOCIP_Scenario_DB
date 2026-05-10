@@ -32,6 +32,7 @@ def upsert_usecase(raw: dict, sha256: str, session: Session) -> None:
     row.pipeline       = obj.pipeline.model_dump(by_alias=True, exclude_none=True)
     row.size_profile   = obj.size_profile.model_dump(exclude_none=True) if obj.size_profile else None
     row.design_axes    = [a.model_dump(exclude_none=True) for a in obj.design_axes]
+    row.sensor         = obj.sensor.model_dump(exclude_none=True) if obj.sensor else None
     row.yaml_sha256    = sha256
     session.add(row)
     session.flush()  # scenario row 확정 후 variants 삽입
@@ -50,4 +51,9 @@ def upsert_usecase(raw: dict, sha256: str, session: Session) -> None:
         vrow.violation_policy    = v.violation_policy.model_dump(exclude_none=True) if v.violation_policy else None
         vrow.tags                = list(v.tags)
         vrow.derived_from_variant = v.derived_from_variant
+        vrow.sim_port_config = (
+            {k: cfg.model_dump(exclude_none=True) for k, cfg in v.sim_port_config.items()}
+            if v.sim_port_config else None
+        )
+        vrow.sim_config = v.sim_config.model_dump(exclude_none=True) if v.sim_config else None
         session.add(vrow)
