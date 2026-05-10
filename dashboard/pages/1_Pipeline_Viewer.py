@@ -288,16 +288,26 @@ visible_layers = LAYERS[mode]
 
 main_col, inspector_col = st.columns([3, 1], gap="small")
 
+# Gate overlay 파라미터 준비 (D-06: gate toggle ON 시에만)
+gate_styles_param = None
+if gate_result is not None:
+    gate_styles_param = {"__global__": str(gate_result.status)}
+
 with main_col:
     render_level0(
         view_response=view,
         visible_layers=visible_layers,
         canvas_height=660,
+        gate_styles=gate_styles_param,
     )
 
 with inspector_col:
     render_inspector(view)
-    # Gate 패널은 Wave 2 (04-03-PLAN)에서 render_gate_inspector() 추가
+    # Gate 인스펙터 (VIEW-04) — toggle ON 시에만
+    if gate_result is not None:
+        st.divider()
+        from dashboard.components.node_detail_panel import render_gate_inspector
+        render_gate_inspector(gate_result)
 
 
 # ── Sidebar 하단 통계 ────────────────────────────────────────────────────────
