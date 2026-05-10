@@ -108,7 +108,19 @@ Cross-cutting constraints:
   3. topology mode에서 SW stack 레인(Camera App → CameraService → HAL → Driver → IP)이 렌더링된다
   4. 인스펙터 패널에 GateExecutionResult(status badge + matched_rules risk card)가 표시된다
   5. Streamlit UI에 `mode=architecture|topology` radio selector가 존재하고 선택 시 레이아웃이 전환된다
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1** *(병렬 실행 가능)*
+- [ ] 04-01-PLAN.md — Service Layer 확장 (SwStackNode 모델 + YAML fixture + service.py 실좌표 계산)
+- [ ] 04-02-PLAN.md — Dashboard HTTP 연동 (1_Pipeline_Viewer.py 전면 재작성 + sidebar UI)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 04-03-PLAN.md — Topology mode + Gate overlay + 통합 테스트
+
+Cross-cutting constraints:
+- Dashboard → FastAPI: HTTP API (`requests.get()`) — 직접 service import 없음 (D-01)
+- `@st.cache_data` 에 모든 캐시 키 파라미터 포함 (api_url, scenario_id, variant_id, mode)
+- `requests.get()` 모든 호출에 `timeout=10` 적용
 **UI hint**: yes
 
 ---
@@ -168,7 +180,7 @@ Cross-cutting constraints:
 | 1. DB Foundation | 3/3 | COMPLETE | 2026-05-07 |
 | 2. Resolver & Gate Engine | 3/3 | COMPLETE | 2026-05-09 |
 | 3. Runtime API | 3/3 | COMPLETE | 2026-05-10 |
-| 4. Level 0 Viewer DB | 0/3 | Not started | - |
+| 4. Level 0 Viewer DB | 0/3 | In progress | - |
 | 5. Schema Extensions | 0/3 | Not started | - |
 | 6. sim/ Package | 0/4 | Not started | - |
 | 7. Simulation API | 0/3 | Not started | - |
