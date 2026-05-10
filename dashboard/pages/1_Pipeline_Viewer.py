@@ -1,6 +1,8 @@
-"""Pipeline Viewer — Level 0 Lane Architecture View.
+"""Pipeline Viewer — Level 0 Lane Architecture View (DB-backed, HTTP API).
 
-Run: uv run --group dashboard streamlit run dashboard/Home.py
+Run:
+  Terminal 1: uv run uvicorn scenario_db.api.app:app --reload
+  Terminal 2: uv run --group dashboard streamlit run dashboard/Home.py
 """
 from __future__ import annotations
 
@@ -9,13 +11,11 @@ from pathlib import Path
 
 # Make src/ importable when running from project root
 _root = Path(__file__).resolve().parents[2]
-if str(_root / "src") not in sys.path:
-    sys.path.insert(0, str(_root / "src"))
-if str(_root) not in sys.path:
-    sys.path.insert(0, str(_root))
-if str(_root / "dashboard") not in sys.path:
-    sys.path.insert(0, str(_root / "dashboard"))
+for p in [str(_root / "src"), str(_root), str(_root / "dashboard")]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
+import requests
 import streamlit as st
 
 st.set_page_config(
@@ -25,12 +25,9 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-from scenario_db.view.service import build_sample_level0
-from dashboard.components.elk_viewer import (
-    ALL_EDGE_TYPES, ALL_LAYERS, render_level0,
-)
+from scenario_db.api.schemas.view import ViewResponse
+from dashboard.components.elk_viewer import render_level0
 from dashboard.components.node_detail_panel import render_inspector
-from dashboard.components.viewer_theme import EDGE_COLOR, LAYER_GRADIENT
 
 
 # ── Global CSS ────────────────────────────────────────────────────────────
@@ -91,154 +88,223 @@ st.markdown("""
 
   /* Column separator */
   div[data-testid="column"]:nth-child(2) {
-    border-left: 1px solid #E8E4DF;
+    border-left: 1px solid #E8E4EB;
   }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ── Session state defaults ─────────────────────────────────────────────────
-if "visible_layers" not in st.session_state:
-    st.session_state["visible_layers"] = list(ALL_LAYERS)
-if "visible_edges" not in st.session_state:
-    st.session_state["visible_edges"] = list(ALL_EDGE_TYPES)
-if "active_tab" not in st.session_state:
-    st.session_state["active_tab"] = "Architect"
+# ── Mode별 visible_layers 설정 (VIEW-02/03) ──────────────────────────────────
+ARCH_LAYERS = ["hw", "memory"]
+TOPO_LAYERS = ["app", "framework", "hal", "kernel", "hw"]
+
+LAYERS: dict[str, list[str]] = {
+    "architecture": ARCH_LAYERS,
+    "topology":     TOPO_LAYERS,
+}
 
 
-# ── Load view data ─────────────────────────────────────────────────────────
+# ── Cache functions (HTTP API) ────────────────────────────────────────────────
+
 @st.cache_data(ttl=60)
-def _load_view():
-    return build_sample_level0()
-
-view = _load_view()
-s = view.summary
-
-
-# ── Header bar ─────────────────────────────────────────────────────────────
-st.markdown(f"""
-<div class="viewer-header">
-  <span style="font-size:20px;color:#6B7280;">☰</span>
-  <span class="viewer-title">{s.name} — {s.subtitle.split(',')[0]}</span>
-  <span class="meta-chip">v1.0</span>
-  <span class="meta-chip">output_period {s.period_ms}ms</span>
-  <span class="meta-chip">budget {s.budget_ms}ms</span>
-  <div style="flex:1"></div>
-  <span style="font-size:12px;color:#6B7280;">
-    Variant: <b>{s.variant_label} ({s.subtitle.split(',')[0]})</b>
-  </span>
-  <span style="background:#EEF2FF;color:#4338CA;border:1px solid #C7D2FE;
-       border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;">
-    ↑ Snapshot / Export
-  </span>
-  <span style="color:#9CA3AF;font-size:18px;">⋯</span>
-</div>
-""", unsafe_allow_html=True)
+def _fetch_scenarios(api_url: str) -> list[dict]:
+    """GET /api/v1/scenarios → items 목록."""
+    r = requests.get(f"{api_url}/api/v1/scenarios", params={"limit": 100}, timeout=10)
+    r.raise_for_status()
+    return r.json()["items"]  # PagedResponse.items 필드 (common.py 검증 완료)
 
 
-# ── Tabs ───────────────────────────────────────────────────────────────────
-tab_exec, tab_arch = st.tabs(["Executive", "Architect"])
+@st.cache_data(ttl=60)
+def _fetch_variants(api_url: str, scenario_id: str) -> list[dict]:
+    """GET /api/v1/scenarios/{id}/variants → items 목록."""
+    r = requests.get(
+        f"{api_url}/api/v1/scenarios/{scenario_id}/variants",
+        params={"limit": 100},
+        timeout=10,
+    )
+    r.raise_for_status()
+    return r.json()["items"]
 
-with tab_arch:
-    # ── Toolbar: layer toggles + edge type toggles ─────────────────────────
-    LAYER_DISPLAY = {
-        "app": "App", "framework": "Framework", "hal": "HAL",
-        "kernel": "Kernel", "hw": "HW", "memory": "Buffer",
-    }
-    EDGE_DISPLAY = {
-        "OTF": "OTF", "vOTF": "vOTF", "M2M": "M2M", "control": "SW", "risk": "Risk",
-    }
 
-    with st.container():
-        toolbar_cols = st.columns([0.5] + [1] * len(ALL_LAYERS) + [0.3] + [1] * len(ALL_EDGE_TYPES))
-        toolbar_cols[0].markdown(
-            '<p style="font-size:11px;font-weight:600;color:#9CA3AF;margin-top:6px;">Layers:</p>',
-            unsafe_allow_html=True,
-        )
+@st.cache_data(ttl=60)
+def _load_view(api_url: str, scenario_id: str, variant_id: str, mode: str) -> ViewResponse:
+    """GET /view?level=0&mode=... → ViewResponse."""
+    r = requests.get(
+        f"{api_url}/api/v1/scenarios/{scenario_id}/variants/{variant_id}/view",
+        params={"level": 0, "mode": mode},
+        timeout=10,
+    )
+    r.raise_for_status()
+    return ViewResponse.model_validate(r.json())
 
-        for i, layer in enumerate(ALL_LAYERS):
-            g = LAYER_GRADIENT.get(layer, {})
-            color = g.get("border", "#6B7280")
-            checked = layer in st.session_state["visible_layers"]
-            val = toolbar_cols[i + 1].checkbox(
-                f"**{LAYER_DISPLAY[layer]}**",
-                value=checked,
-                key=f"layer_{layer}",
-            )
-            # Update session state
-            if val and layer not in st.session_state["visible_layers"]:
-                st.session_state["visible_layers"].append(layer)
-            elif not val and layer in st.session_state["visible_layers"]:
-                st.session_state["visible_layers"].remove(layer)
 
-        sep_col = toolbar_cols[len(ALL_LAYERS) + 1]
-        sep_col.markdown(
-            '<p style="font-size:11px;font-weight:600;color:#9CA3AF;margin-top:6px;">Edges:</p>',
-            unsafe_allow_html=True,
-        )
-
-        for j, etype in enumerate(ALL_EDGE_TYPES):
-            ec = EDGE_COLOR.get(etype, "#6B7280")
-            checked_e = etype in st.session_state["visible_edges"]
-            val_e = toolbar_cols[len(ALL_LAYERS) + 2 + j].checkbox(
-                f"**{EDGE_DISPLAY[etype]}**",
-                value=checked_e,
-                key=f"edge_{etype}",
-            )
-            if val_e and etype not in st.session_state["visible_edges"]:
-                st.session_state["visible_edges"].append(etype)
-            elif not val_e and etype in st.session_state["visible_edges"]:
-                st.session_state["visible_edges"].remove(etype)
-
-    st.markdown("<hr style='margin:0;border-color:#E8E4DF;'>", unsafe_allow_html=True)
-
-    # ── Main content: diagram (left 75%) + inspector (right 25%) ──────────
-    main_col, inspector_col = st.columns([3, 1], gap="small")
-
-    with main_col:
-        render_level0(
-            view_response=view,
-            visible_layers=st.session_state["visible_layers"],
-            visible_edge_types=st.session_state["visible_edges"],
-            canvas_height=640,
-        )
-
-    with inspector_col:
-        with st.container():
-            render_inspector(view)
-
-with tab_exec:
-    st.markdown("""
-    <div style="padding:40px;text-align:center;color:#9CA3AF;">
-      <p style="font-size:32px;margin-bottom:12px;">📊</p>
-      <p style="font-size:16px;font-weight:600;color:#374151;">Executive View</p>
-      <p style="font-size:13px;margin-top:8px;">
-        Phase C: KPI summary, feasibility verdict, and top-3 risks dashboard.
-      </p>
-    </div>
-    """, unsafe_allow_html=True)
+@st.cache_data(ttl=30)
+def _fetch_gate(api_url: str, scenario_id: str, variant_id: str):
+    """GET /gate → GateExecutionResult (lazy, toggle ON 시에만 호출)."""
+    from scenario_db.gate.models import GateExecutionResult
+    r = requests.get(
+        f"{api_url}/api/v1/scenarios/{scenario_id}/variants/{variant_id}/gate",
+        timeout=10,
+    )
+    r.raise_for_status()
+    return GateExecutionResult.model_validate(r.json())
 
 
 # ── Sidebar ────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("### ScenarioDB Viewer")
-    st.markdown("**Level 0** — Lane Architecture View")
+
+    # API URL 설정 (D-02)
+    st.markdown("**API Server**")
+    api_url = st.text_input(
+        "Base URL",
+        value=st.session_state.get("api_url", "http://localhost:8000"),
+        label_visibility="collapsed",
+    )
+    if api_url != st.session_state.get("api_url"):
+        st.session_state["api_url"] = api_url
+        st.cache_data.clear()
+        st.rerun()
+    st.session_state["api_url"] = api_url
+
     st.divider()
 
+    # Scenario dropdown (D-03)
     st.markdown("**Scenario**")
-    st.code(view.scenario_id, language=None)
-    st.markdown("**Variant**")
-    st.code(view.variant_id, language=None)
+    try:
+        scenarios = _fetch_scenarios(api_url)
+    except Exception as e:
+        st.error(f"API 연결 실패: {e}")
+        st.stop()
 
-    st.divider()
-    st.markdown("**View Level**")
-    level = st.radio(
-        "Level", ["0 — Lane View", "1 — IP DAG (Phase C)", "2 — Drill-Down (Phase C)"],
-        index=0, label_visibility="collapsed",
+    if not scenarios:
+        st.warning("Scenario 없음 — DB에 데이터가 있는지 확인하세요.")
+        st.stop()
+
+    # ScenarioResponse.metadata_ 는 dict → name 추출 (D-03)
+    scenario_labels = [
+        s.get("metadata_", {}).get("name", s["id"]) for s in scenarios
+    ]
+    scenario_ids = [s["id"] for s in scenarios]
+    sel_scenario_idx = st.selectbox(
+        "scenario",
+        range(len(scenario_ids)),
+        format_func=lambda i: scenario_labels[i],
+        label_visibility="collapsed",
+    )
+    scenario_id = scenario_ids[sel_scenario_idx]
+
+    # Variant dropdown (D-03)
+    st.markdown("**Variant**")
+    try:
+        variants = _fetch_variants(api_url, scenario_id)
+    except Exception as e:
+        st.error(f"Variant 조회 실패: {e}")
+        st.stop()
+
+    variant_ids = [v["id"] for v in variants]
+    if not variant_ids:
+        st.warning("Variant 없음")
+        st.stop()
+    variant_id = st.selectbox(
+        "variant",
+        variant_ids,
+        label_visibility="collapsed",
     )
 
     st.divider()
+
+    # Mode selector (D-05, VIEW-05)
+    st.markdown("**View Mode**")
+    mode = st.radio(
+        "mode",
+        ["architecture", "topology"],
+        index=0,
+        label_visibility="collapsed",
+    )
+
+    st.divider()
+
+    # Gate status 토글 (D-06, lazy fetch)
+    show_gate = st.toggle("Show Gate Status", value=False)
+
+    st.divider()
+    st.markdown("**View Level**")
+    st.radio(
+        "Level",
+        ["0 — Lane View", "1 — IP DAG (Phase C)", "2 — Drill-Down (Phase C)"],
+        index=0,
+        label_visibility="collapsed",
+    )
+
+
+# ── View 데이터 로드 ─────────────────────────────────────────────────────────
+try:
+    view = _load_view(api_url, scenario_id, variant_id, mode)
+except requests.HTTPError as e:
+    if e.response is not None and e.response.status_code == 501:
+        st.warning("Topology mode는 Wave 2에서 구현됩니다 (04-03-PLAN)")
+        st.stop()
+    st.error(f"View 로드 실패: {e}")
+    st.stop()
+except Exception as e:
+    st.error(f"API 오류: {e}")
+    st.stop()
+
+s = view.summary
+
+# ── Gate 데이터 (toggle ON 시에만 lazy fetch) (D-06) ─────────────────────────
+gate_result = None
+if show_gate:
+    try:
+        gate_result = _fetch_gate(api_url, scenario_id, variant_id)
+    except Exception as e:
+        st.sidebar.warning(f"Gate 조회 실패: {e}")
+
+
+# ── Header bar ─────────────────────────────────────────────────────────────
+over_budget = s.period_ms > s.budget_ms if s.budget_ms else False
+budget_chip_color = "#FEE2E2" if over_budget else "#F3F4F6"
+budget_text_color = "#DC2626" if over_budget else "#6B7280"
+
+st.markdown(f"""
+<div class="viewer-header">
+  <span style="font-size:20px;color:#6B7280;">&#9776;</span>
+  <span class="viewer-title">{s.name}</span>
+  <span class="meta-chip">{mode} mode</span>
+  <span class="meta-chip">output_period {s.period_ms}ms</span>
+  <span style="background:{budget_chip_color};color:{budget_text_color};border-radius:6px;
+       padding:3px 8px;font-size:11px;">budget {s.budget_ms}ms</span>
+  <div style="flex:1"></div>
+  <span style="font-size:12px;color:#6B7280;">
+    Variant: <b>{s.variant_label}</b>
+  </span>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ── Main 레이아웃 ─────────────────────────────────────────────────────────────
+visible_layers = LAYERS[mode]
+
+main_col, inspector_col = st.columns([3, 1], gap="small")
+
+with main_col:
+    render_level0(
+        view_response=view,
+        visible_layers=visible_layers,
+        canvas_height=660,
+    )
+
+with inspector_col:
+    render_inspector(view)
+    # Gate 패널은 Wave 2 (04-03-PLAN)에서 render_gate_inspector() 추가
+
+
+# ── Sidebar 하단 통계 ────────────────────────────────────────────────────────
+with st.sidebar:
     st.caption(f"Nodes: {len(view.nodes)} | Edges: {len(view.edges)}")
     st.caption(f"Risks: {len(view.risks)}")
-    if view.summary.captured_at:
-        st.caption(f"Captured: {view.summary.captured_at}")
+    if gate_result is not None:
+        st.caption(f"Gate: {gate_result.status}")
+    if s.captured_at:
+        st.caption(f"Captured: {s.captured_at}")
