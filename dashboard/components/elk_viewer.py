@@ -492,17 +492,12 @@ if(typeof ELK === 'undefined'){
     const g = document.getElementById('g-main');
     drawNode(g, layout, 0, 0);
 
-    console.log('[ELK] layout done W='+W+' H='+H+
-      ' nodes='+(layout.children||[]).length+
-      ' edges='+(layout.edges||[]).length);
-
     fitView(W, H);
     setupZoomPan();
   }).catch(function(err){
     const dbg = document.getElementById('debug');
     dbg.textContent = 'ELK error: '+err;
     dbg.style.display = 'block';
-    console.error('[ELK]', err);
   });
 }
 
