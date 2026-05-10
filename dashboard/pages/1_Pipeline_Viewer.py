@@ -122,7 +122,7 @@ LAYERS: dict[str, list[str]] = {
 
 # ── Cache functions (HTTP API) ────────────────────────────────────────────────
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=30)
 def _fetch_scenarios(api_url: str) -> list[dict]:
     """GET /api/v1/scenarios → items 목록."""
     r = requests.get(f"{api_url}/api/v1/scenarios", params={"limit": 100}, timeout=10)
@@ -130,7 +130,7 @@ def _fetch_scenarios(api_url: str) -> list[dict]:
     return r.json()["items"]  # PagedResponse.items 필드 (common.py 검증 완료)
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=30)
 def _fetch_variants(api_url: str, scenario_id: str) -> list[dict]:
     """GET /api/v1/scenarios/{id}/variants → items 목록."""
     r = requests.get(
