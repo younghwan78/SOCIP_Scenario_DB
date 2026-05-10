@@ -510,12 +510,18 @@ def render_level0(
     visible_edge_types: list[str] | None = None,
     canvas_height: int = 640,
     selected_node: dict | None = None,
+    gate_styles: dict[str, str] | None = None,
 ) -> None:
-    """Render Level 0 ELK/SVG pipeline diagram into the current Streamlit location."""
+    """Render Level 0 ELK/SVG pipeline diagram into the current Streamlit location.
+
+    gate_styles: {"__global__": "WARN"|"BLOCK"|"PASS"|"WAIVER_REQUIRED"} or None.
+    When provided, applies border/warning override to ip-type nodes (D-06, VIEW-04).
+    """
     elk_graph, meta = build_elk_graph(
         view_response,
         visible_layers=visible_layers,
         visible_edge_types=visible_edge_types,
+        gate_styles=gate_styles,
     )
     html = _render_html(elk_graph, meta, canvas_height)
     components.html(html, height=canvas_height + 4, scrolling=False)
