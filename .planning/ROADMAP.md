@@ -111,8 +111,8 @@ Cross-cutting constraints:
 **Plans**: 3 plans
 Plans:
 **Wave 1** *(병렬 실행 가능)*
-- [ ] 04-01-PLAN.md — Service Layer 확장 (SwStackNode 모델 + YAML fixture + service.py 실좌표 계산)
-- [ ] 04-02-PLAN.md — Dashboard HTTP 연동 (1_Pipeline_Viewer.py 전면 재작성 + sidebar UI)
+- [x] 04-01-PLAN.md — Service Layer 확장 (SwStackNode 모델 + YAML fixture + service.py 실좌표 계산)
+- [x] 04-02-PLAN.md — Dashboard HTTP 연동 (1_Pipeline_Viewer.py 전면 재작성 + sidebar UI)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 04-03-PLAN.md — Topology mode + Gate overlay + 통합 테스트
