@@ -29,6 +29,7 @@ class IpCatalog(Base):
     rtl_version    = Column(Text)
     compatible_soc = Column(JSONB)          # list[str]
     yaml_sha256    = Column(Text, nullable=False)
+    sim_params     = Column(JSONB)            # nullable — Phase 5 추가 (SCH-01)
 
 
 class SwProfile(Base):

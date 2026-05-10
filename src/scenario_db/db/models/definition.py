@@ -27,6 +27,7 @@ class Scenario(Base):
     size_profile   = Column(JSONB)
     design_axes    = Column(JSONB)
     yaml_sha256    = Column(Text, nullable=False)
+    sensor         = Column(JSONB)            # nullable — Phase 5 추가 (SCH-03)
 
 
 class ScenarioVariant(Base):
@@ -41,3 +42,5 @@ class ScenarioVariant(Base):
     violation_policy     = Column(JSONB)
     tags                 = Column(JSONB)                    # list[str]
     derived_from_variant = Column(Text)
+    sim_port_config = Column(JSONB)           # nullable — Phase 5 추가 (SCH-02)
+    sim_config      = Column(JSONB)           # nullable — Phase 5 추가 (SCH-02)
