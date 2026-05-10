@@ -8,6 +8,8 @@ dashboard can also call this module directly without an HTTP round-trip.
 """
 from __future__ import annotations
 
+import logging
+
 from scenario_db.api.schemas.view import (
     EdgeData, EdgeElement, MemoryDescriptor, MemoryPlacement,
     NodeData, NodeElement, OperationSummary, RiskCard,
@@ -238,6 +240,8 @@ CATEGORY_TO_LANE: dict[str, str] = {
 
 STAGE_STEP: int = 310  # px per stage level (capture→processing 간격 기반)
 
+_logger = logging.getLogger(__name__)
+
 
 def _projection_to_view_response(projection: dict) -> ViewResponse:
     """get_view_projection() dict → 실좌표 ViewResponse (architecture mode).
@@ -286,7 +290,13 @@ def _projection_to_view_response(projection: dict) -> ViewResponse:
         ip_ref = node.get("ip_ref", "")
         ip_info = ip_catalog.get(ip_ref, {})
         category = ip_info.get("category", "")
-        lane = CATEGORY_TO_LANE.get(category, "hw")
+        lane = CATEGORY_TO_LANE.get(category)
+        if lane is None:
+            _logger.warning(
+                "Unknown ip_catalog category %r for node %r — defaulting to 'hw'",
+                category, nid,
+            )
+            lane = "hw"
         s_idx = stage_map.get(nid, 0)
         x = float(LANE_LABEL_W + s_idx * STAGE_STEP + STAGE_STEP // 2)
         y = LANE_Y[lane]

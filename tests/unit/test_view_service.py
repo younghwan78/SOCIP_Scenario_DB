@@ -98,8 +98,9 @@ def test_isolated_node_gets_stage_0():
     assert view.nodes[0].position["x"] > LANE_LABEL_W
 
 
-def test_unknown_category_falls_back_to_hw():
-    """ip_catalog에 없는 ip_ref → category="" → CATEGORY_TO_LANE fallback 'hw'."""
+def test_unknown_category_falls_back_to_hw(caplog):
+    """ip_catalog에 없는 ip_ref → category="" → 'hw' fallback + warning 로그."""
+    import logging
     proj = {
         "scenario_id": "uc-test",
         "variant_id":  "v-test",
@@ -109,9 +110,14 @@ def test_unknown_category_falls_back_to_hw():
         },
         "ip_catalog": [],  # empty catalog — no lookup possible
     }
-    view = _projection_to_view_response(proj)
+    with caplog.at_level(logging.WARNING, logger="scenario_db.view.service"):
+        view = _projection_to_view_response(proj)
     assert len(view.nodes) == 1
     assert view.nodes[0].data.layer == "hw"
+    # WR-01: unknown category must emit a warning, not silently fall back
+    assert any("Unknown ip_catalog category" in r.message for r in caplog.records), (
+        "Expected a WARNING for unknown ip_catalog category, but none was emitted"
+    )
 
 
 def test_empty_pipeline_returns_empty_view():
