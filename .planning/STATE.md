@@ -3,7 +3,7 @@
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
 - **Current Phase**: Phase 5 — Schema Extensions
-- **Status**: Phase 4 COMPLETE (3/3 plans executed + reviewed). Phase 5 not started.
+- **Status**: Phase 5 planned (3/3 plans ready). Ready to execute.
 - **Last Updated**: 2026-05-10
 
 ---
@@ -25,7 +25,7 @@ Progress: ████████████░░░░░░░░ 4 / 7 pha
 | 2 | Resolver & Gate Engine | M1 | Phase 1 | COMPLETE (3/3 plans) |
 | 3 | Runtime API | M1 | Phase 1, 2 | COMPLETE (3/3 plans) |
 | 4 | Level 0 Viewer DB | M1 | Phase 3 | COMPLETE (3/3 plans) |
-| 5 | Schema Extensions | M2 | Phase 1, 4 | Not started |
+| 5 | Schema Extensions | M2 | Phase 1, 4 | Ready to start (3/3 plans) |
 | 6 | sim/ Package | M2 | Phase 5 | Not started |
 | 7 | Simulation API | M2 | Phase 5, 6 | Not started |
 
