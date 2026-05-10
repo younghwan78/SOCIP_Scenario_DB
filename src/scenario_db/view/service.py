@@ -357,6 +357,10 @@ def _sw_stack_to_view_response(projection: dict) -> ViewResponse:
 
     layer_x_counter: dict[str, int] = {}  # 레이어별 노드 누적 인덱스
 
+    # HW 노드 먼저 계산 — SW 노드 ID 충돌 검사에 필요
+    hw_view = _projection_to_view_response(projection)
+    hw_node_ids = {n.data.id for n in hw_view.nodes}
+
     sw_nodes: list[NodeElement] = []
     sw_node_ids: set[str] = set()
 
@@ -364,7 +368,7 @@ def _sw_stack_to_view_response(projection: dict) -> ViewResponse:
         layer = sw.get("layer", "app")
         nid = sw.get("id", "")
         label = sw.get("label", nid)
-        if not nid:
+        if not nid or nid in hw_node_ids:   # skip: empty id or collision with HW node id
             continue
         idx = layer_x_counter.get(layer, 0)
         x = float(X_START + idx * X_STEP)
@@ -375,10 +379,6 @@ def _sw_stack_to_view_response(projection: dict) -> ViewResponse:
             data=NodeData(id=nid, label=label, type="sw", layer=layer),
             position={"x": x, "y": y},
         ))
-
-    # HW 노드 (architecture mode와 동일한 좌표) — topology에서도 표시
-    hw_view = _projection_to_view_response(projection)
-    hw_node_ids = {n.data.id for n in hw_view.nodes}
 
     # SW→HW control edges (ip_ref 있는 sw_stack 노드만)
     sw_hw_edges: list[EdgeElement] = []
