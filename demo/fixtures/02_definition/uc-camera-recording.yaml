@@ -19,6 +19,15 @@ pipeline:
     - { from: csis0, to: isp0, type: OTF }
     - { from: isp0,  to: mfc,  type: M2M, buffer: "RECORD_BUF" }
     - { from: isp0,  to: dpu,  type: M2M, buffer: "PREVIEW_BUF" }
+  sw_stack:
+    - { layer: app,       id: app-camera,   label: "Camera App" }
+    - { layer: framework, id: fw-cam-svc,   label: "CameraService" }
+    - { layer: hal,       id: hal-camera,   label: "Camera HAL" }
+    - { layer: kernel,    id: ker-v4l2,     label: "V4L2 Driver",  ip_ref: csis0 }
+    - { layer: hal,       id: hal-codec2,   label: "Codec2 HAL" }
+    - { layer: kernel,    id: ker-mfc-drv,  label: "MFC Driver",   ip_ref: mfc }
+    - { layer: hal,       id: hal-disp,     label: "Display HAL" }
+    - { layer: kernel,    id: ker-drm,      label: "DRM/KMS",      ip_ref: dpu }
 
 size_profile:
   anchors:
