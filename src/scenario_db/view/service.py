@@ -443,6 +443,10 @@ def project_level0(scenario_id: str, variant_id: str, *, mode: str = "architectu
         raise NotImplementedError(f"mode '{mode}' is not supported")
 
     if db is None:
+        # Demo / offline mode — return architecture sample regardless of requested mode.
+        # build_sample_level0() always returns mode="architecture"; the caller (Streamlit
+        # dashboard) uses LAYERS[mode] for filtering, so topology mode shows an empty
+        # diagram here.  TODO: add _build_sample_topology() in Wave 2 to fix this.
         return build_sample_level0()
 
     from scenario_db.db.repositories.view_projection import get_view_projection
