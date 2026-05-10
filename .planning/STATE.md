@@ -3,7 +3,7 @@
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
 - **Current Phase**: Phase 4 — Level 0 Viewer DB
-- **Status**: Phase 3 complete (3/3 plans). Phase 4 not started.
+- **Status**: Phase 4 planned (3/3 plans ready). Ready to execute.
 - **Last Updated**: 2026-05-10
 
 ---
@@ -80,3 +80,4 @@ _Updated after each phase transition._
 - **Phase 3 end**: 2026-05-10 (3 plans complete — runtime.py router, view mode DB projection, 8 new integration tests, 159 total passing)
 - **Phase 4 start**: 2026-05-10
 - **Phase 4 context**: 2026-05-10 (`.planning/phases/04-level0-viewer-db/04-CONTEXT.md`)
+- **Phase 4 planned**: 2026-05-10 — 3 plans (PLAN-01 Wave1A: service.py 실좌표, PLAN-02 Wave1B: Dashboard HTTP 연동, PLAN-03 Wave2: topology + gate overlay)
