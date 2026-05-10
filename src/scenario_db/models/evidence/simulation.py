@@ -30,6 +30,27 @@ class IpBreakdown(BaseScenarioModel):
     submodules: list[SubmoduleBreakdown] = Field(default_factory=list)
 
 
+class PortBWResult(BaseScenarioModel):
+    ip: str
+    port: str
+    direction: Literal["read", "write"]
+    bw_mbs: float
+    bw_mbs_worst: float | None = None
+    bw_power_mw: float
+    format: str | None = None
+    compression: str | None = None
+    llc_enabled: bool = False
+
+
+class IPTimingResult(BaseScenarioModel):
+    ip: str
+    hw_time_ms: float
+    required_clock_mhz: float
+    set_clock_mhz: float
+    set_voltage_mv: float
+    feasible: bool
+
+
 class SimulationEvidence(BaseScenarioModel):
     id: DocumentId
     schema_version: SchemaVersion
@@ -45,6 +66,8 @@ class SimulationEvidence(BaseScenarioModel):
     kpi: dict[str, float | int] = Field(default_factory=dict)
     ip_breakdown: list[IpBreakdown] = Field(default_factory=list)
     artifacts: list[Artifact] = Field(default_factory=list)
+    dma_breakdown: list[PortBWResult] = Field(default_factory=list)      # Phase 5 추가
+    timing_breakdown: list[IPTimingResult] = Field(default_factory=list)  # Phase 5 추가
 
     @model_validator(mode="after")
     def _validate_kpi_keys(self) -> SimulationEvidence:

@@ -149,6 +149,42 @@ class ViolationPolicy(BaseScenarioModel):
 
 
 # ---------------------------------------------------------------------------
+# Simulation config models (Phase 5)
+# ---------------------------------------------------------------------------
+
+class PortInputConfig(BaseScenarioModel):
+    port: str
+    format: str
+    bitwidth: int = 8
+    width: int
+    height: int
+    compression: Literal["SBWC", "AFBC", "disable"] = "disable"
+    comp_ratio: float = 1.0
+    comp_ratio_min: float | None = None
+    comp_ratio_max: float | None = None
+    llc_enabled: bool = False
+    llc_weight: float = 1.0
+    r_w_rate: float = 1.0
+
+
+class IPPortConfig(BaseScenarioModel):
+    mode: str = "Normal"
+    sw_margin_override: float | None = None
+    inputs: list[PortInputConfig] = Field(default_factory=list)
+    outputs: list[PortInputConfig] = Field(default_factory=list)
+
+
+class SimGlobalConfig(BaseScenarioModel):
+    asv_group: int = 4
+    sw_margin: float = 0.25
+    bw_power_coeff: float = 80.0
+    vbat: float = 4.0
+    pmic_eff: float = 0.85
+    h_blank_margin: float = 0.05
+    dvfs_overrides: dict[str, int] = Field(default_factory=dict)
+
+
+# ---------------------------------------------------------------------------
 # Variant
 # ---------------------------------------------------------------------------
 
@@ -163,6 +199,8 @@ class Variant(BaseScenarioModel):
     tags: list[str] = Field(default_factory=list)
     derived_from_variant: str | None = None
     design_conditions_override: dict[str, str | int | float] | None = None
+    sim_port_config: dict[str, IPPortConfig] | None = None  # Phase 5 추가
+    sim_config: SimGlobalConfig | None = None               # Phase 5 추가
 
 
 # ---------------------------------------------------------------------------
@@ -192,6 +230,19 @@ class UsecaseMetadata(BaseScenarioModel):
 
 
 # ---------------------------------------------------------------------------
+# Sensor spec (Phase 5)
+# ---------------------------------------------------------------------------
+
+class SensorSpec(BaseScenarioModel):
+    """OTF 그룹 타이밍 제약 기준 — v_valid_time 기반 처리량."""
+    ip_ref: DocumentId
+    frame_width: int
+    frame_height: int
+    fps: float
+    v_valid_ratio: float = 0.85
+
+
+# ---------------------------------------------------------------------------
 # Usecase (Definition Layer root)
 # ---------------------------------------------------------------------------
 
@@ -208,6 +259,7 @@ class Usecase(BaseScenarioModel):
     inheritance_policy: InheritancePolicy | None = None
     parametric_sweeps: list[ParametricSweep] = Field(default_factory=list)
     references: UsecaseReferences | None = None
+    sensor: SensorSpec | None = None  # Phase 5 추가 — Usecase 레벨 OTF 센서 스펙
 
     @model_validator(mode="after")
     def _validate_no_inheritance_cycle(self) -> Usecase:

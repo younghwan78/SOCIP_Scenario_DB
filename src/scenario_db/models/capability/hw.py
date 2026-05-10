@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import StrEnum
 from typing import Literal
 
 from pydantic import Field, model_validator
@@ -77,6 +78,34 @@ class IpSubmodule(BaseScenarioModel):
 
 
 # ---------------------------------------------------------------------------
+# Simulation parameters (Phase 5)
+# ---------------------------------------------------------------------------
+
+class PortType(StrEnum):
+    DMA_READ  = "DMA_READ"
+    DMA_WRITE = "DMA_WRITE"
+    OTF_IN    = "OTF_IN"
+    OTF_OUT   = "OTF_OUT"
+
+
+class PortSpec(BaseScenarioModel):
+    name: str
+    type: PortType
+    max_bw_gbps: float | None = None
+
+
+class IPSimParams(BaseScenarioModel):
+    hw_name_in_sim: str
+    ppc: float
+    unit_power_mw_mp: float
+    idc: float = 0.0
+    vdd: str
+    dvfs_group: str
+    latency_us: float = 0.0
+    ports: list[PortSpec] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
 # IP Catalog entry (ip-*.yaml)
 # ---------------------------------------------------------------------------
 
@@ -89,6 +118,7 @@ class IpCatalog(BaseScenarioModel):
     capabilities: IpCapabilities
     rtl_version: str | None = None
     compatible_soc: list[DocumentId] = Field(default_factory=list)
+    sim_params: IPSimParams | None = None  # Phase 5 추가 — backward compat Optional
 
 
 # ---------------------------------------------------------------------------
