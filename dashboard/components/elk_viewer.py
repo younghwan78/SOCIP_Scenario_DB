@@ -518,9 +518,11 @@ if(typeof ELK === 'undefined'){
 
 def _render_html(elk_graph: dict, meta: dict, canvas_h: int) -> str:
     html = _HTML_TEMPLATE
-    html = html.replace("/*__GRAPH__*/", json.dumps(elk_graph, ensure_ascii=False))
-    html = html.replace("/*__META__*/",  json.dumps(meta,      ensure_ascii=False))
-    # Replace all occurrences (appears in CSS height and JS constant)
+    # count=1: prevent a JSON value that coincidentally contains "/*__META__*/" or
+    # "/*__CANVAS_H__*/" from being re-substituted by a later replace() call.
+    html = html.replace("/*__GRAPH__*/", json.dumps(elk_graph, ensure_ascii=False), 1)
+    html = html.replace("/*__META__*/",  json.dumps(meta,      ensure_ascii=False), 1)
+    # /*__CANVAS_H__*/ appears intentionally multiple times (CSS + JS) — replace all.
     html = html.replace("/*__CANVAS_H__*/", str(canvas_h))
     return html
 
