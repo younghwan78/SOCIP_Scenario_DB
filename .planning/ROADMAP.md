@@ -10,7 +10,7 @@ _Created: 2026-05-05_
 - [x] **Phase 2: Resolver & Gate Engine** — 비영속 Resolver + GateExecutionResult 엔진 (순수 Python)
 - [x] **Phase 3: Runtime API** — /graph, /resolve, /gate 엔드포인트 + view router DB 연동
 - [x] **Phase 4: Level 0 Viewer DB** — project_level0(db) 구현, topology mode, gate overlay
-- [ ] **Phase 5: Schema Extensions** — IpCatalog.sim_params + Variant.sim_port_config/sim_config + Usecase.sensor + SimulationEvidence 확장
+- [x] **Phase 5: Schema Extensions** — IpCatalog.sim_params + Variant.sim_port_config/sim_config + Usecase.sensor + SimulationEvidence 확장
 - [ ] **Phase 6: sim/ Package** — constants/models/bw_calc/perf_calc/power_calc/dvfs_resolver/adapter/runner
 - [ ] **Phase 7: Simulation API** — /simulation/ 라우터 + params_hash 캐싱
 
@@ -139,11 +139,11 @@ Cross-cutting constraints:
 **Plans**: 3 plans
 
 **Wave 1** *(병렬 실행 가능)*
-- [ ] 05-01-PLAN.md — Pydantic 모델 확장 (IPSimParams/PortSpec/SensorSpec/PortBWResult 등 8개 신규 모델 + 기존 3개 모델 필드 추가 + 단위 테스트 + fixture 2종)
-- [ ] 05-02-PLAN.md — ORM + Alembic migration (4개 ORM 파일에 6개 JSONB 컬럼 추가 + 0002_schema_extensions.py 수동 작성)
+- [x] 05-01-PLAN.md — Pydantic 모델 확장 (IPSimParams/PortSpec/SensorSpec/PortBWResult 등 8개 신규 모델 + 기존 3개 모델 필드 추가 + 단위 테스트 + fixture 2종)
+- [x] 05-02-PLAN.md — ORM + Alembic migration (4개 ORM 파일에 6개 JSONB 컬럼 추가 + 0002_schema_extensions.py 수동 작성)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 05-03-PLAN.md — ETL 매퍼 확장 + 통합 테스트 (3개 mapper 직렬화 추가 + migration 0002 + backward compat 검증)
+- [x] 05-03-PLAN.md — ETL 매퍼 확장 + 통합 테스트 (3개 mapper 직렬화 추가 + migration 0002 + backward compat 검증)
 
 Cross-cutting constraints:
 - 신규 Pydantic 필드는 반드시 `= None` 또는 `default_factory` 기본값 (backward compat 필수)
@@ -194,7 +194,7 @@ Cross-cutting constraints:
 | 2. Resolver & Gate Engine | 3/3 | COMPLETE | 2026-05-09 |
 | 3. Runtime API | 3/3 | COMPLETE | 2026-05-10 |
 | 4. Level 0 Viewer DB | 3/3 | COMPLETE | 2026-05-10 |
-| 5. Schema Extensions | 0/3 | Not started | - |
+| 5. Schema Extensions | 3/3 | COMPLETE | 2026-05-10 |
 | 6. sim/ Package | 0/4 | Not started | - |
 | 7. Simulation API | 0/3 | Not started | - |
 
