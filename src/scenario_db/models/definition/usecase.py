@@ -42,9 +42,19 @@ class PipelineEdge(BaseModel):
     buffer: str | None = None
 
 
+class SwStackNode(BaseScenarioModel):
+    """SW 스택 노드 — topology mode용 (app/framework/hal/kernel 레이어)."""
+
+    layer: Literal["app", "framework", "hal", "kernel"]
+    id: str
+    label: str
+    ip_ref: str | None = None  # 연결 HW IP pipeline node id (e.g., "csis0", "mfc")
+
+
 class Pipeline(BaseScenarioModel):
     nodes: list[PipelineNode] = Field(default_factory=list)
     edges: list[PipelineEdge] = Field(default_factory=list)
+    sw_stack: list[SwStackNode] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _validate_edge_references(self) -> Pipeline:
