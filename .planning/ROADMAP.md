@@ -115,7 +115,7 @@ Plans:
 - [x] 04-02-PLAN.md — Dashboard HTTP 연동 (1_Pipeline_Viewer.py 전면 재작성 + sidebar UI)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 04-03-PLAN.md — Topology mode + Gate overlay + 통합 테스트
+- [x] 04-03-PLAN.md — Topology mode + Gate overlay + 통합 테스트
 
 Cross-cutting constraints:
 - Dashboard → FastAPI: HTTP API (`requests.get()`) — 직접 service import 없음 (D-01)
