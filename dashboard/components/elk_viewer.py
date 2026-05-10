@@ -357,27 +357,52 @@ function drawStageHeaders(g, layout){
 // ── Tooltip ───────────────────────────────────────────────────────────────
 const tip = document.getElementById('tooltip');
 
+// Build a tooltip row using textContent (XSS-safe) for all user data values.
+function _ttRow(key, val){
+  const row = document.createElement('div'); row.className='tt-row';
+  const k = document.createElement('span'); k.className='k'; k.textContent=key;
+  const v = document.createElement('span'); v.textContent=val;
+  row.appendChild(k); row.appendChild(v);
+  return row;
+}
+
 function showTip(ev, nodeId, m){
   const d = m.detail||{};
-  let h = '<div class="tt-title">'+(m.label||nodeId)+'</div>';
-  if(d.layer) h += '<div class="tt-row"><span class="k">Layer</span><span>'+d.layer+'</span></div>';
-  if(d.type)  h += '<div class="tt-row"><span class="k">Type</span><span>'+d.type+'</span></div>';
-  if(d.ip_ref) h += '<div class="tt-row"><span class="k">IP ref</span><span>'+d.ip_ref+'</span></div>';
-  if(d.scale) h += '<div class="tt-row"><span class="k">Scale</span><span>'+d.scale+'</span></div>';
-  if(d.crop)  h += '<div class="tt-row"><span class="k">Crop</span><span>'+d.crop+'</span></div>';
+  // Clear previous content safely
+  while(tip.firstChild) tip.removeChild(tip.firstChild);
+
+  // Title (textContent — no raw HTML)
+  const title = document.createElement('div'); title.className='tt-title';
+  title.textContent = m.label||nodeId;
+  tip.appendChild(title);
+
+  if(d.layer) tip.appendChild(_ttRow('Layer', d.layer));
+  if(d.type)  tip.appendChild(_ttRow('Type',  d.type));
+  if(d.ip_ref) tip.appendChild(_ttRow('IP ref', d.ip_ref));
+  if(d.scale) tip.appendChild(_ttRow('Scale', d.scale));
+  if(d.crop)  tip.appendChild(_ttRow('Crop',  d.crop));
   if(d.capabilities && d.capabilities.length){
-    h += '<div class="tt-row"><span class="k">Capabilities</span><span>'+
-      d.capabilities.map(function(b){ return '<span class="tt-badge">'+b+'</span>'; }).join('')+
-      '</span></div>';
+    const row = document.createElement('div'); row.className='tt-row';
+    const k = document.createElement('span'); k.className='k'; k.textContent='Capabilities';
+    const v = document.createElement('span');
+    d.capabilities.forEach(function(b){
+      const badge = document.createElement('span'); badge.className='tt-badge';
+      badge.textContent=b; v.appendChild(badge);
+    });
+    row.appendChild(k); row.appendChild(v); tip.appendChild(row);
   }
-  if(d.memory) h += '<div class="tt-row"><span class="k">Memory</span><span>'+d.memory+'</span></div>';
-  if(d.llc)    h += '<div class="tt-row"><span class="k">LLC</span><span>'+d.llc+'</span></div>';
+  if(d.memory) tip.appendChild(_ttRow('Memory', d.memory));
+  if(d.llc)    tip.appendChild(_ttRow('LLC',    d.llc));
   if(d.issues && d.issues.length){
-    h += '<div class="tt-row"><span class="k">Issues</span><span>'+
-      d.issues.map(function(i){ return '<span class="tt-badge tt-risk">'+i+'</span>'; }).join('')+
-      '</span></div>';
+    const row = document.createElement('div'); row.className='tt-row';
+    const k = document.createElement('span'); k.className='k'; k.textContent='Issues';
+    const v = document.createElement('span');
+    d.issues.forEach(function(i){
+      const badge = document.createElement('span'); badge.className='tt-badge tt-risk';
+      badge.textContent=i; v.appendChild(badge);
+    });
+    row.appendChild(k); row.appendChild(v); tip.appendChild(row);
   }
-  tip.innerHTML = h;
   tip.style.display = 'block';
   const tw = tip.offsetWidth||220, th2 = tip.offsetHeight||120;
   const mx = ev.clientX+14, my = ev.clientY+14;

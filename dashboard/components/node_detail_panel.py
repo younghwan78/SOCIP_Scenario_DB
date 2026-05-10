@@ -1,10 +1,16 @@
 """Right inspector panel — scenario summary, risk cards, notes, gate inspector."""
 from __future__ import annotations
 
+import html as html_mod
 import streamlit as st
 
 from scenario_db.api.schemas.view import RiskCard, ViewResponse, ViewSummary
 from dashboard.components.viewer_theme import SEVERITY_BG, SEVERITY_COLOR
+
+
+def _escape(s: str | None) -> str:
+    """HTML-escape a value from DB/API data before interpolation into innerHTML."""
+    return html_mod.escape(str(s or ""))
 
 
 def _metric_row(label: str, value: str) -> str:
@@ -25,19 +31,19 @@ def _risk_card(risk: RiskCard) -> str:
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
         <span style="background:{sev_color};color:white;font-size:10px;font-weight:700;
               border-radius:50%;width:18px;height:18px;display:inline-flex;
-              align-items:center;justify-content:center;">{risk.id}</span>
-        <span style="font-size:12px;font-weight:700;color:#111827;">{risk.title}</span>
+              align-items:center;justify-content:center;">{_escape(risk.id)}</span>
+        <span style="font-size:12px;font-weight:700;color:#111827;">{_escape(risk.title)}</span>
       </div>
       <div style="font-size:11px;color:#6B7280;margin-bottom:4px;">
-        Component: {risk.component}
+        Component: {_escape(risk.component)}
       </div>
       <div style="font-size:11px;color:#374151;margin-bottom:6px;line-height:1.4;">
-        {risk.description}
+        {_escape(risk.description)}
       </div>
       <div style="display:flex;gap:6px;align-items:center;">
         <span style="background:{sev_bg};color:{sev_color};font-size:10px;font-weight:600;
-              border-radius:4px;padding:2px 7px;">{risk.severity}</span>
-        <span style="font-size:10px;color:#9CA3AF;">Impact: {risk.impact}</span>
+              border-radius:4px;padding:2px 7px;">{_escape(risk.severity)}</span>
+        <span style="font-size:10px;color:#9CA3AF;">Impact: {_escape(risk.impact)}</span>
       </div>
     </div>"""
 
@@ -55,17 +61,17 @@ def render_inspector(view: ViewResponse) -> None:
     )
     st.markdown(
         f'<p style="font-size:18px;font-weight:700;color:#111827;line-height:1.2;">'
-        f'{s.name}</p>'
-        f'<p style="font-size:12px;color:#6B7280;margin-bottom:10px;">{s.subtitle}</p>',
+        f'{_escape(s.name)}</p>'
+        f'<p style="font-size:12px;color:#6B7280;margin-bottom:10px;">{_escape(s.subtitle)}</p>',
         unsafe_allow_html=True,
     )
 
     metrics_html = (
-        _metric_row("Period",     f"{s.period_ms} ms")
-        + _metric_row("Budget",     f"{s.budget_ms} ms")
-        + _metric_row("Resolution", s.resolution)
-        + _metric_row("Frame Rate", f"{s.fps} fps")
-        + _metric_row("Variant",    s.variant_label)
+        _metric_row("Period",     f"{_escape(str(s.period_ms))} ms")
+        + _metric_row("Budget",     f"{_escape(str(s.budget_ms))} ms")
+        + _metric_row("Resolution", _escape(s.resolution))
+        + _metric_row("Frame Rate", f"{_escape(str(s.fps))} fps")
+        + _metric_row("Variant",    _escape(s.variant_label))
     )
     st.markdown(
         f'<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;'
@@ -96,13 +102,13 @@ def render_inspector(view: ViewResponse) -> None:
         st.markdown(
             f'<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;'
             f'padding:10px 12px;font-size:11px;color:#374151;line-height:1.5;">'
-            f'{s.notes}',
+            f'{_escape(s.notes)}',
             unsafe_allow_html=True,
         )
         if s.captured_at:
             st.markdown(
                 f'<p style="font-size:10px;color:#9CA3AF;margin-top:6px;">'
-                f'Captured: {s.captured_at}</p></div>',
+                f'Captured: {_escape(s.captured_at)}</p></div>',
                 unsafe_allow_html=True,
             )
         else:
@@ -159,7 +165,7 @@ def render_gate_inspector(gate) -> None:
         issues_html = "".join(
             f'<span style="display:inline-block;background:#FEE2E2;color:#991B1B;'
             f'border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;'
-            f'margin:0 4px 4px 0;">{iss}</span>'
+            f'margin:0 4px 4px 0;">{_escape(iss)}</span>'
             for iss in gate.matched_issues
         )
         st.markdown(
@@ -178,7 +184,7 @@ def render_gate_inspector(gate) -> None:
         waivers_html = "".join(
             f'<span style="display:inline-block;background:#F5F3FF;color:#5B21B6;'
             f'border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;'
-            f'margin:0 4px 4px 0;">{w}</span>'
+            f'margin:0 4px 4px 0;">{_escape(w)}</span>'
             for w in gate.missing_waivers
         )
         st.markdown(
@@ -203,8 +209,8 @@ def render_gate_inspector(gate) -> None:
                 f'padding:8px 10px;margin-bottom:6px;'
                 f'border-left:3px solid {rule_style["border"]};">'
                 f'<div style="font-size:11px;font-weight:700;color:#111827;">'
-                f'{rule_match.rule_id}</div>'
-                f'<div style="font-size:10px;color:#6B7280;margin-top:2px;">{msg}</div>'
+                f'{_escape(rule_match.rule_id)}</div>'
+                f'<div style="font-size:10px;color:#6B7280;margin-top:2px;">{_escape(msg)}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
