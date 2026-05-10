@@ -180,7 +180,7 @@ Cross-cutting constraints:
 | 1. DB Foundation | 3/3 | COMPLETE | 2026-05-07 |
 | 2. Resolver & Gate Engine | 3/3 | COMPLETE | 2026-05-09 |
 | 3. Runtime API | 3/3 | COMPLETE | 2026-05-10 |
-| 4. Level 0 Viewer DB | 0/3 | In progress | - |
+| 4. Level 0 Viewer DB | 3/3 | COMPLETE | 2026-05-10 |
 | 5. Schema Extensions | 0/3 | Not started | - |
 | 6. sim/ Package | 0/4 | Not started | - |
 | 7. Simulation API | 0/3 | Not started | - |
