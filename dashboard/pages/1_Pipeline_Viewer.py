@@ -122,10 +122,18 @@ LAYERS: dict[str, list[str]] = {
 
 # ── Cache functions (HTTP API) ────────────────────────────────────────────────
 
+@st.cache_resource
+def _api_session() -> requests.Session:
+    """Shared HTTP session — connection pooling, shared headers (future: auth token)."""
+    s = requests.Session()
+    s.headers.update({"Accept": "application/json"})
+    return s
+
+
 @st.cache_data(ttl=30)
 def _fetch_scenarios(api_url: str) -> list[dict]:
     """GET /api/v1/scenarios → items 목록."""
-    r = requests.get(f"{api_url}/api/v1/scenarios", params={"limit": 100}, timeout=10)
+    r = _api_session().get(f"{api_url}/api/v1/scenarios", params={"limit": 100}, timeout=(5, 10))
     r.raise_for_status()
     return r.json()["items"]  # PagedResponse.items 필드 (common.py 검증 완료)
 
@@ -133,10 +141,10 @@ def _fetch_scenarios(api_url: str) -> list[dict]:
 @st.cache_data(ttl=30)
 def _fetch_variants(api_url: str, scenario_id: str) -> list[dict]:
     """GET /api/v1/scenarios/{id}/variants → items 목록."""
-    r = requests.get(
+    r = _api_session().get(
         f"{api_url}/api/v1/scenarios/{scenario_id}/variants",
         params={"limit": 100},
-        timeout=10,
+        timeout=(5, 10),
     )
     r.raise_for_status()
     return r.json()["items"]
@@ -145,10 +153,10 @@ def _fetch_variants(api_url: str, scenario_id: str) -> list[dict]:
 @st.cache_data(ttl=60)
 def _load_view(api_url: str, scenario_id: str, variant_id: str, mode: str) -> ViewResponse:
     """GET /view?level=0&mode=... → ViewResponse."""
-    r = requests.get(
+    r = _api_session().get(
         f"{api_url}/api/v1/scenarios/{scenario_id}/variants/{variant_id}/view",
         params={"level": 0, "mode": mode},
-        timeout=10,
+        timeout=(5, 10),
     )
     r.raise_for_status()
     return ViewResponse.model_validate(r.json())
@@ -158,9 +166,9 @@ def _load_view(api_url: str, scenario_id: str, variant_id: str, mode: str) -> Vi
 def _fetch_gate(api_url: str, scenario_id: str, variant_id: str):
     """GET /gate → GateExecutionResult (lazy, toggle ON 시에만 호출)."""
     from scenario_db.gate.models import GateExecutionResult
-    r = requests.get(
+    r = _api_session().get(
         f"{api_url}/api/v1/scenarios/{scenario_id}/variants/{variant_id}/gate",
-        timeout=10,
+        timeout=(5, 10),
     )
     r.raise_for_status()
     return GateExecutionResult.model_validate(r.json())
