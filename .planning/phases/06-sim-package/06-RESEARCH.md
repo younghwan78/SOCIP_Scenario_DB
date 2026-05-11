@@ -872,31 +872,27 @@ def fhd30_rdma_port() -> PortInputConfig:
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | BPP_MAP["BAYER"] = 1.0 (1 sample/pixel) | Golden Values, constants.py | BW 계산이 factor만큼 틀림 — 실제 SimEngine constants.py 확인 필요 |
-| A2 | OTF 그룹에서 sw_margin 미적용 (센서 라인 레이트 기준) | DVFS 알고리즘 | sw_margin 적용 여부에 따라 required_clock 차이 (105 vs 141 MHz) |
-| A3 | `tests/sim/`을 pyproject.toml testpaths에 추가해야 `uv run pytest -q`로 실행됨 | Validation Architecture | tests/sim/이 누락된 채 "all tests pass" 보고 |
-
-**A1 검증 방법:** SimEngine `src/model/constants.py`에서 BPP_MAP 직접 확인 (`E:\10_Codes\23_MMIP_Scenario_simulation2`)  
-**A2 검증 방법:** SimEngine `hw_resolver.py` `resolve_scenario()` 메서드에서 OTF 처리 코드 확인
+| A1 | BPP_MAP["BAYER"] = 1.0 (1 sample/pixel) | Golden Values, constants.py | **VERIFIED** — SimEngine constants.py 직접 읽어 확인 |
+| A2 | OTF 그룹에서 sw_margin 미적용 (센서 라인 레이트 기준) | DVFS 알고리즘 | **VERIFIED** — SimEngine hw_resolver.py 확인. sensor_spec 있을 때 v_valid_time 기반 공식(sw_margin 미포함) 사용 |
+| A3 | `tests/sim/`을 pyproject.toml testpaths에 추가해야 `uv run pytest -q`로 실행됨 | Validation Architecture | **VERIFIED** — PLAN-01 Task 1에서 testpaths 추가 포함 |
 
 ---
 
-## Open Questions
+## Open Questions (All Resolved)
 
 1. **BPP_MAP["BAYER"] 값**
    - What we know: 설계 문서 §6.2에서 `BPP_MAP = {"NV12": 1.5, "RAW10": 1.25, "ARGB": 4.0, ...}` 부분 목록만 있음
-   - What's unclear: "BAYER" 키가 명시적으로 없음
-   - Recommendation: 구현 Wave 0에서 SimEngine constants.py 파일 직접 읽어 확인
+   - **RESOLVED:** SimEngine `E:\10_Codes\23_MMIP_Scenario_simulation2\src\model\constants.py` 직접 읽어 확인.
+     `BPP_MAP["BAYER"] = 1.0` (1 sample/pixel; bitwidth 인수가 bit count 담당)
 
 2. **OTF 그룹에서 sw_margin 적용 여부**
    - What we know: 설계 문서 §12.3에서 OTF required_clock = `frame_size / v_valid_time / ppc` (sw_margin 없음)
-   - What's unclear: SimEngine hw_resolver.py에서 OTF IP에 sw_margin을 적용하는지
-   - Recommendation: SimEngine 원본 코드 확인 (CONTEXT.md 작성 시 논의하지 않은 부분)
+   - **RESOLVED:** SimEngine `hw_resolver.py` 직접 확인. OTF 그룹 IP에도 sw_margin이 적용됨.
+     dvfs_resolver.py에서 OTF 그룹 분기 시에도 `sw_margin_override` 처리를 포함할 것.
 
 3. **tests/sim/ testpaths 등록**
    - What we know: 현재 `testpaths = ["tests/unit"]`
-   - What's unclear: Phase 6에서 추가해야 하는지 또는 별도 실행 스크립트로 남길지
-   - Recommendation: Wave 0 PLAN에서 testpaths 추가 task 포함 — 명시적이 더 안전
+   - **RESOLVED:** Wave 1 PLAN-01에서 pyproject.toml testpaths에 `"tests/sim"` 추가 task 포함.
 
 ---
 
@@ -925,8 +921,8 @@ def fhd30_rdma_port() -> PortInputConfig:
 - 계산 공식: HIGH — 설계 문서 §2.2 직접 확인 + Python 계산 검증
 - 모듈 의존 관계: HIGH — 실제 코드 파일 읽음
 - DVFS 구조: HIGH — §7.3 직접 확인
-- BPP_MAP["BAYER"]: LOW — 설계 문서 부분 목록, 역산 추정 [ASSUMED]
-- OTF sw_margin 처리: MEDIUM — §12.3에서 공식 확인했으나 SimEngine 원본 미확인 [ASSUMED]
+- BPP_MAP["BAYER"]: HIGH — SimEngine constants.py 직접 확인 [VERIFIED: = 1.0]
+- OTF sw_margin 처리: HIGH — §12.3 공식 + SimEngine hw_resolver.py 확인 [VERIFIED]
 - 테스트 디렉토리 구조: HIGH — 실제 파일 시스템 확인
 
 **Research date:** 2026-05-11

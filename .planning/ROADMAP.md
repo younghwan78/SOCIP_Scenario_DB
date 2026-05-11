@@ -165,7 +165,21 @@ Cross-cutting constraints:
   3. `calc_processing_time()` 이 h_blank_margin 포함 처리시간(ms)을 반환하고, `calc_active_power()` 가 V² 스케일링 + fps 스케일링을 적용한다
   4. `DvfsResolver` 가 OTF 그룹 v_valid_time 제약을 지키며 VDD 도메인 전압을 정렬하고, `dvfs-projectA.yaml` 이 CAM/INT/MIF 도메인을 정의한다
   5. `scenario_adapter.py` 가 Usecase.pipeline + Variant.sim_port_config를 runner 입력으로 변환하고, `runner.py` 가 전체 파이프라인을 실행하여 `SimRunResult` 를 반환한다
-**Plans**: TBD
+**Plans**: 3 plans
+
+**Wave 1** *(병렬 실행 가능)*
+- [ ] 06-01-PLAN.md — 인프라 + constants + models (config.py DVFS_CONFIG_PATH, dvfs-projectA.yaml, sim/__init__.py, constants.py, models.py, conftest.py, pyproject.toml)
+- [ ] 06-02-PLAN.md — 계산 함수 (bw_calc.py, perf_calc.py, power_calc.py) + Golden 값 단위 테스트
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 06-03-PLAN.md — DVFS Resolver + Adapter + Runner + 통합 테스트 (dvfs_resolver.py, scenario_adapter.py, runner.py, test_dvfs_resolver.py, test_runner.py)
+
+Cross-cutting constraints:
+- `sim/` 패키지: DB/ORM import 없음 — 순수 Pydantic (D-05)
+- `BaseScenarioModel` 상속 필수 (ConfigDict(extra='forbid') 자동)
+- `PortBWResult`/`IPTimingResult`: evidence.simulation에서 re-import (재정의 없음, D-01)
+- DVFS fallback: logging.warning + set_clock=required, voltage=710mV (ValueError 없음, D-03)
+- 테스트: YAML 파일 의존 없음, 인라인 픽스처 + Golden 값 assert (D-06)
 **UI hint**: no
 
 ---
@@ -195,7 +209,7 @@ Cross-cutting constraints:
 | 3. Runtime API | 3/3 | COMPLETE | 2026-05-10 |
 | 4. Level 0 Viewer DB | 3/3 | COMPLETE | 2026-05-10 |
 | 5. Schema Extensions | 3/3 | COMPLETE | 2026-05-10 |
-| 6. sim/ Package | 0/4 | Not started | - |
+| 6. sim/ Package | 0/3 | Ready to execute | - |
 | 7. Simulation API | 0/3 | Not started | - |
 
 ---

@@ -3,8 +3,8 @@
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
 - **Current Phase**: Phase 6 — sim/ Package
-- **Status**: Phase 5 COMPLETE (3/3 plans). Ready to plan Phase 6.
-- **Last Updated**: 2026-05-10
+- **Status**: Phase 6 PLANNED (3/3 plans). Ready to execute.
+- **Last Updated**: 2026-05-11
 
 ---
 
@@ -26,7 +26,7 @@ Progress: ███████████████░░░░░ 5 / 7 pha
 | 3 | Runtime API | M1 | Phase 1, 2 | COMPLETE (3/3 plans) |
 | 4 | Level 0 Viewer DB | M1 | Phase 3 | COMPLETE (3/3 plans) |
 | 5 | Schema Extensions | M2 | Phase 1, 4 | COMPLETE (3/3 plans) |
-| 6 | sim/ Package | M2 | Phase 5 | Not started |
+| 6 | sim/ Package | M2 | Phase 5 | Ready to execute (3/3 plans) |
 | 7 | Simulation API | M2 | Phase 5, 6 | Not started |
 
 ---
@@ -84,3 +84,6 @@ _Updated after each phase transition._
 - **Phase 4 end**: 2026-05-10 (3 plans complete — _projection_to_view_response, Dashboard HTTP, topology mode + gate overlay, 493 tests passing)
 - **Phase 5 start**: 2026-05-10
 - **Phase 5 end**: 2026-05-10 (3 plans complete — 8 new Pydantic models, 6 JSONB ORM columns, Alembic migration 0002, ETL serialization, 16 unit + 8 integration tests)
+- **Phase 6 start**: 2026-05-11
+- **Phase 6 context**: 2026-05-11 (`.planning/phases/06-sim-package/06-CONTEXT.md`)
+- **Phase 6 planned**: 2026-05-11 — 3 plans (PLAN-01 Wave1: infra+constants+models, PLAN-02 Wave1: bw/perf/power calc, PLAN-03 Wave2: dvfs_resolver+adapter+runner)
