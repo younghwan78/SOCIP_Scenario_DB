@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field
 from pydantic.aliases import AliasChoices
@@ -26,3 +27,7 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """Settings 싱글톤 — lru_cache로 캐싱. 테스트 격리 시 get_settings.cache_clear() 사용."""
     return Settings()
+
+
+# DVFS 설정 파일 경로 — production 로드 경로. 테스트는 dvfs_tables dict 직접 주입.
+DVFS_CONFIG_PATH: Path = Path("hw_config/dvfs-projectA.yaml")

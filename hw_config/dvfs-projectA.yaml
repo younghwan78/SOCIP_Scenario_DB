@@ -1,0 +1,28 @@
+# hw_config/dvfs-projectA.yaml
+# ProjectA DVFS 테이블 — CAM/INT/MIF 도메인
+# 설계 문서 §7.3 기준
+dvfs_tables:
+  CAM:
+    - level: 0
+      speed_mhz: 600
+      voltages: {0: 820, 4: 780, 8: 750}
+    - level: 1
+      speed_mhz: 533
+      voltages: {0: 760, 4: 720, 8: 700}
+    - level: 2
+      speed_mhz: 400
+      voltages: {0: 700, 4: 660, 8: 630}
+  INT:
+    - level: 0
+      speed_mhz: 533
+      voltages: {0: 800, 4: 760, 8: 730}
+    - level: 1
+      speed_mhz: 333
+      voltages: {0: 730, 4: 690, 8: 660}
+  MIF:
+    - level: 0
+      speed_mhz: 3200
+      voltages: {0: 750, 4: 730, 8: 710}
+    - level: 1
+      speed_mhz: 2133
+      voltages: {0: 700, 4: 680, 8: 660}

@@ -49,7 +49,7 @@ dashboard = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/unit"]
+testpaths = ["tests/unit", "tests/sim"]
 markers = [
     "unit: pure Python, no external deps",
     "integration: requires Docker + PostgreSQL testcontainer",
