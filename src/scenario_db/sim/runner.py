@@ -206,6 +206,23 @@ def run_simulation(
         else 0.0
     )
 
+    # timing_breakdown이 비어있으면 sim_params 있는 IP가 없음 → 계산 미수행으로 feasible=False 처리
+    if not timing_breakdown:
+        return SimRunResult(
+            scenario_id=scenario_id,
+            variant_id=variant_id,
+            total_power_mw=total_power_mw,
+            total_power_ma=total_power_ma,
+            bw_total_mbs=bw_total_mbs,
+            hw_time_max_ms=0.0,
+            feasible=False,
+            infeasible_reason="No IP with sim_params found in pipeline — calculation not performed",
+            resolved=resolved,
+            dma_breakdown=dma_breakdown,
+            timing_breakdown=[],
+            vdd_power=vdd_power,
+        )
+
     hw_time_max_ms = max((t.hw_time_ms for t in timing_breakdown), default=0.0)
     all_feasible = all(t.feasible for t in timing_breakdown)
     infeasible_reason: str | None = None
