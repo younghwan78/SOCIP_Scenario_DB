@@ -37,6 +37,13 @@ def calc_port_bw(
         )
 
     bpp = BPP_MAP.get(port.format, 1.0)
+    # RAW10은 bit-packing이 이미 BPP에 반영(1.25=10/8) — bitwidth=10과 조합 시 이중 적용 방지
+    if port.format == "RAW10" and port.bitwidth != 8:
+        raise ValueError(
+            f"format='RAW10' uses pre-packed BPP={bpp} (10-bit packed). "
+            f"Expected bitwidth=8, got bitwidth={port.bitwidth}. "
+            f"Use format='BAYER' with bitwidth=10 for explicit bit-count control."
+        )
     # compression="disable"이면 comp_ratio 무시 (Pitfall 4)
     comp_ratio = port.comp_ratio if port.compression != "disable" else 1.0
     # llc_enabled=False이면 llc_weight 무시
