@@ -69,10 +69,10 @@ Phase 1~4 + Phase A + Phase B Week 1 완료 상태:
 
 **Milestone 2 — Simulation Engine**
 
-- [ ] **M2-SIM1**: `sim/` 패키지 — constants, bw_calc, power_calc, perf_calc, dvfs_resolver
-- [ ] **M2-SCHEMA**: IpCatalog.sim_params + Variant.sim_port_config + sim_config 스키마 확장
-- [ ] **M2-EVIDENCE**: SimulationEvidence 확장 (dma_breakdown, timing_breakdown)
-- [ ] **M2-RUNNER**: `sim/runner.py` + `sim/scenario_adapter.py`
+- [x] **M2-SIM1**: `sim/` 패키지 — constants, bw_calc, power_calc, perf_calc, dvfs_resolver — Validated in Phase 6
+- [x] **M2-SCHEMA**: IpCatalog.sim_params + Variant.sim_port_config + sim_config 스키마 확장 — Validated in Phase 5
+- [x] **M2-EVIDENCE**: SimulationEvidence 확장 (dma_breakdown, timing_breakdown) — Validated in Phase 5
+- [x] **M2-RUNNER**: `sim/runner.py` + `sim/scenario_adapter.py` — Validated in Phase 6
 - [ ] **M2-API**: `/simulation/` 라우터 (run, results, bw-analysis, power-analysis, timing-analysis)
 - [ ] **M2-CACHE**: params_hash 캐시 (SHA256 기반 중복 계산 생략)
 
@@ -111,4 +111,4 @@ Phase 1~4 + Phase A + Phase B Week 1 완료 상태:
 3. Out of Scope 이유 재검토
 
 ---
-*Last updated: 2026-05-05 after initialization*
+*Last updated: 2026-05-16 — Phase 6 complete (sim/ Package: 9 modules, 41 tests, run_simulation() interface confirmed)*
