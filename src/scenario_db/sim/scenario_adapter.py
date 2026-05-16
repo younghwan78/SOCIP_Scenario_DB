@@ -23,8 +23,15 @@ def _resolve_ip_name(ip_ref: str, ip_catalog: dict[str, IpCatalog]) -> str:
     if catalog and catalog.sim_params:
         return catalog.sim_params.hw_name_in_sim
     # Fallback: "ip-isp-v12" -> parts[1].upper() = "ISP"
+    # "ip-<name>-<ver>" 패턴을 요구; 불일치 시 warning 로그 출력
     parts = ip_ref.split("-")
-    return parts[1].upper() if len(parts) > 1 else ip_ref
+    if len(parts) >= 3 and parts[0] == "ip":
+        return parts[1].upper()
+    logger.warning(
+        "ip_ref %r does not match 'ip-<name>-<ver>' pattern — using ip_ref as-is",
+        ip_ref,
+    )
+    return ip_ref.upper()
 
 
 def build_ip_params(
