@@ -45,7 +45,11 @@ class DVFSTable(BaseScenarioModel):
         levels는 speed_mhz 내림차순 정렬 가정 (level 0 = 최고속).
         required를 충족하는 가장 낮은 speed 레벨 = 가장 높은 level 번호.
         """
-        eligible = [lv for lv in self.levels if lv.speed_mhz >= required_clock_mhz]
+        # asv_group에 해당하는 voltage 항목이 있는 레벨만 후보로 사용
+        eligible = [
+            lv for lv in self.levels
+            if lv.speed_mhz >= required_clock_mhz and asv_group in lv.voltages
+        ]
         if not eligible:
             return None
         # speed가 가장 작은 것 (level 번호가 가장 큰 것) 선택 → 전력 최소화
