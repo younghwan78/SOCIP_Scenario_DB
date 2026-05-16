@@ -191,10 +191,10 @@ def run_simulation(
     bw_power_total = sum(r.bw_power_mw for r in dma_breakdown)
     total_power_mw += bw_power_total
 
-    # total_power_ma = total_power_mw / (vbat_V * pmic_eff) [mA]
-    # = total_power_mw [mW] / (vbat [V] * pmic_eff) / 1000 * 1000 = / (vbat * pmic_eff)
+    # total_power_ma = total_power_mw [mW] / (vbat_V [V] * pmic_eff) [mA]
+    # 단위: mW / V = mA (pmic_eff는 무차원)
     total_power_ma = (
-        total_power_mw / (sim_config.vbat * sim_config.pmic_eff * 1000.0) * 1000.0
+        total_power_mw / (sim_config.vbat * sim_config.pmic_eff)
         if sim_config.vbat > 0 and sim_config.pmic_eff > 0
         else 0.0
     )

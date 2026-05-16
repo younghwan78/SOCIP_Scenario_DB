@@ -57,7 +57,7 @@ class SimRunResult(BaseScenarioModel):
     scenario_id: str
     variant_id: str
     total_power_mw: float
-    total_power_ma: float        # mA = total_power_mw / (vbat * pmic_eff * 1000) * 1000
+    total_power_ma: float        # mA = total_power_mw / (vbat_V * pmic_eff)
     bw_total_mbs: float          # sum(dma_breakdown[].bw_mbs)
     hw_time_max_ms: float        # max(timing_breakdown[].hw_time_ms)
     feasible: bool               # hw_time_max_ms <= (1000.0 / fps)
