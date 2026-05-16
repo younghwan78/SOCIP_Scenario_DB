@@ -3,7 +3,7 @@
 - **Project**: ScenarioDB Viewer MVP & Simulation Engine
 - **Current Milestone**: Milestone 1 — Viewer & Runtime
 - **Current Phase**: Phase 6 — sim/ Package
-- **Status**: Phase 6 IN PROGRESS (1/3 plans complete).
+- **Status**: Phase 6 IN PROGRESS (2/3 plans complete).
 - **Last Updated**: 2026-05-16
 
 ---
@@ -43,6 +43,8 @@ Progress: ███████████████░░░░░ 5 / 7 pha
 | DVFS 테이블 YAML화 | `hw_config/dvfs-projectA.yaml` |
 | D-01 단일 정의 원칙 (Phase 6) | PortBWResult/IPTimingResult는 evidence.simulation에서 re-import — 재정의 없음 |
 | DVFS_CONFIG_PATH 배치 (Phase 6) | Settings 클래스 외부 모듈 수준 상수 — 환경변수 불필요 |
+| OTF 포트 direction 필드 (Phase 6-02) | Literal[read,write] 제약 충족 위해 read 고정 — bw_mbs=0으로 실질적 의미 없음 |
+| compression=disable 시 comp_ratio 무시 (Phase 6-02) | Pitfall 4 방지 — 명시적 분기 구현, BPP_MAP fallback=1.0 보수적 처리 |
 | Soft validation 채택 (Phase 1) | validate_loaded() — 오류 수집 후 리포트, DB 상태 유지 |
 | model_validate() + from_attributes=True (Phase 1) | row.__dict__ 패턴 금지 — _sa_instance_state extra='forbid' 위반 |
 | 수동 6-쿼리 전략 (Phase 1) | ORM relationship 없이 joinedload/selectinload 금지, 수동 배치 쿼리 |
@@ -51,7 +53,7 @@ Progress: ███████████████░░░░░ 5 / 7 pha
 
 ### Existing Baseline
 
-- FastAPI 36 endpoints + 464 tests (313 unit + 159 integration, all passing); sim/ 14 tests (Phase 6-01)
+- FastAPI 36 endpoints + 464 tests (313 unit + 159 integration, all passing); sim/ 30 tests (Phase 6-01: 14, Phase 6-02: 16)
 - Runtime API: /graph, /resolve, /gate 엔드포인트 (Phase 3 완료)
 - View Router: mode 분기 (architecture=DB projection, topology=501)
 - ELK Level 0 Viewer (sample data 제거 완료, Phase 4에서 ELK 레이아웃 구현)
@@ -90,3 +92,4 @@ _Updated after each phase transition._
 - **Phase 6 context**: 2026-05-11 (`.planning/phases/06-sim-package/06-CONTEXT.md`)
 - **Phase 6 planned**: 2026-05-11 — 3 plans (PLAN-01 Wave1: infra+constants+models, PLAN-02 Wave1: bw/perf/power calc, PLAN-03 Wave2: dvfs_resolver+adapter+runner)
 - **Phase 6 PLAN-01 end**: 2026-05-16 (sim/ 인프라 확립, 14 tests passing — commits fc4c338 f350440 673ebde)
+- **Phase 6 PLAN-02 end**: 2026-05-16 (bw_calc/perf_calc/power_calc 순수 함수, 16 tests passing — commits a57e02e b4d90b9 56e0018 458474d)
