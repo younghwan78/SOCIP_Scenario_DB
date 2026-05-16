@@ -110,15 +110,20 @@ def test_dvfs_otf_group_constraint(
     )
 
     # OTF 그룹 required_clock = 4000*3000 / ((1/30)*0.85) / 4 / 1e6 = 105.88 MHz
-    # -> level 0(600MHz) 또는 level 1(533MHz) 선택 — 최소 레벨 = 533MHz
+    # 400MHz(level 2) >= 105.88 MHz -> 최소 레벨 = 400MHz (level 2)
+    # (sw_margin 미적용이지만 ppc=4로 required가 낮아 400MHz로 충족 가능)
     for node_id in ("csis0", "isp0"):
         assert node_id in resolved
         r = resolved[node_id]
-        assert r.set_clock_mhz >= 533.0, (
-            f"{node_id}: set_clock={r.set_clock_mhz} should be >= 533 MHz (OTF constraint)"
-        )
+        # OTF 제약이 적용되어 required_clock이 M2M보다 높아야 함 (sw_margin 없으므로)
+        # M2M required = 1920*1080*30 / ((1-0.25)*4) / 1e6 = 20.74 MHz (port_config 기본값)
+        # OTF required = 105.88 MHz >> 20.74 MHz — OTF 제약이 더 엄격함 확인
         assert r.required_clock_mhz > 100.0, (
             f"{node_id}: required_clock={r.required_clock_mhz} should reflect OTF constraint"
+        )
+        # 105.88 MHz를 충족하는 최소 레벨: 400MHz(level2) >= 105.88 -> 400MHz
+        assert r.set_clock_mhz >= 400.0, (
+            f"{node_id}: set_clock={r.set_clock_mhz} should be >= 400 MHz (OTF constraint)"
         )
 
 
