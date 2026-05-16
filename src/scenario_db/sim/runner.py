@@ -89,16 +89,23 @@ def run_simulation(
         # IPSimParams.ports에서 각 포트의 PortType 조회
         port_type_map: dict[str, PortType] = {ps.name: ps.type for ps in params.ports}
 
-        for port_input in port_cfg.inputs + port_cfg.outputs:
-            port_type = port_type_map.get(port_input.port)
-            if port_type is None:
-                # PortType 모름 -> direction에 따라 DMA 타입 결정
-                port_type = (
-                    PortType.DMA_READ if port_input in port_cfg.inputs else PortType.DMA_WRITE
-                )
-
+        # inputs 포트 처리 (DMA_READ 기본값)
+        for port_input in port_cfg.inputs:
+            port_type = port_type_map.get(port_input.port, PortType.DMA_READ)
             bw_result = calc_port_bw(
                 port=port_input,
+                ip_name=ip_name,
+                port_type=port_type,
+                fps=effective_fps,
+                bw_power_coeff=sim_config.bw_power_coeff,
+            )
+            dma_breakdown.append(bw_result)
+
+        # outputs 포트 처리 (DMA_WRITE 기본값)
+        for port_output in port_cfg.outputs:
+            port_type = port_type_map.get(port_output.port, PortType.DMA_WRITE)
+            bw_result = calc_port_bw(
+                port=port_output,
                 ip_name=ip_name,
                 port_type=port_type,
                 fps=effective_fps,
