@@ -57,9 +57,6 @@ def run_simulation(
     # Step 2: DVFS resolve
     # ------------------------------------------------------------------
     resolver = DvfsResolver(dvfs_tables=dvfs_tables, asv_group=sim_config.asv_group)
-    dvfs_overrides: dict[str, int] | None = (
-        sim_config.dvfs_overrides if sim_config.dvfs_overrides else None
-    )
     resolved: dict[str, ResolvedIPConfig] = resolver.resolve(
         ip_params=ip_params,
         port_configs=variant_port_config,
@@ -67,7 +64,7 @@ def run_simulation(
         fps=effective_fps,
         sw_margin=sim_config.sw_margin,
         sensor_spec=sensor_spec,
-        dvfs_overrides=dvfs_overrides,
+        dvfs_overrides=sim_config.dvfs_overrides or None,
     )
 
     # ------------------------------------------------------------------
