@@ -11,7 +11,7 @@ _Created: 2026-05-05_
 - [x] **Phase 3: Runtime API** — /graph, /resolve, /gate 엔드포인트 + view router DB 연동
 - [x] **Phase 4: Level 0 Viewer DB** — project_level0(db) 구현, topology mode, gate overlay
 - [x] **Phase 5: Schema Extensions** — IpCatalog.sim_params + Variant.sim_port_config/sim_config + Usecase.sensor + SimulationEvidence 확장
-- [ ] **Phase 6: sim/ Package** — constants/models/bw_calc/perf_calc/power_calc/dvfs_resolver/adapter/runner
+- [x] **Phase 6: sim/ Package** — constants/models/bw_calc/perf_calc/power_calc/dvfs_resolver/adapter/runner
 - [ ] **Phase 7: Simulation API** — /simulation/ 라우터 + params_hash 캐싱
 
 ---
@@ -172,7 +172,7 @@ Cross-cutting constraints:
 - [x] 06-02-PLAN.md — 계산 함수 (bw_calc.py, perf_calc.py, power_calc.py) + Golden 값 단위 테스트
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 06-03-PLAN.md — DVFS Resolver + Adapter + Runner + 통합 테스트 (dvfs_resolver.py, scenario_adapter.py, runner.py, test_dvfs_resolver.py, test_runner.py)
+- [x] 06-03-PLAN.md — DVFS Resolver + Adapter + Runner + 통합 테스트 (dvfs_resolver.py, scenario_adapter.py, runner.py, test_dvfs_resolver.py, test_runner.py)
 
 Cross-cutting constraints:
 - `sim/` 패키지: DB/ORM import 없음 — 순수 Pydantic (D-05)
@@ -209,7 +209,7 @@ Cross-cutting constraints:
 | 3. Runtime API | 3/3 | COMPLETE | 2026-05-10 |
 | 4. Level 0 Viewer DB | 3/3 | COMPLETE | 2026-05-10 |
 | 5. Schema Extensions | 3/3 | COMPLETE | 2026-05-10 |
-| 6. sim/ Package | 2/3 | In Progress | - |
+| 6. sim/ Package | 3/3 | COMPLETE | 2026-05-16 |
 | 7. Simulation API | 0/3 | Not started | - |
 
 ---
