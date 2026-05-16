@@ -188,6 +188,8 @@ def run_simulation(
             set_voltage_mv=r.set_voltage_mv,
             fps=effective_fps,
         )
+        # idc (idle/static current) 는 의도적으로 미적용 — 현재 scope는 active power만 계산.
+        # params.idc 기본값=0.0이므로 IP 정지 전류(leakage) 포함 시 여기에 추가할 것.
         total_power_mw += power_mw
         vdd_power[r.vdd] = vdd_power.get(r.vdd, 0.0) + power_mw
 
