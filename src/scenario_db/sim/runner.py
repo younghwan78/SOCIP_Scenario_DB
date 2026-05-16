@@ -131,14 +131,14 @@ def run_simulation(
         ip_name = _resolve_ip_name(node.ip_ref, ip_catalog)
         r = resolved[node_id]
 
-        # 처리 해상도: port_configs에서 출력 port 첫 번째 항목 사용
+        # 처리 해상도: multi-output IP 대응을 위해 최대 해상도 포트 사용
         port_cfg = variant_port_config.get(node_id)
         pixels: int = 1920 * 1080  # 기본값 FHD
         if port_cfg:
             if port_cfg.outputs:
-                pixels = port_cfg.outputs[0].width * port_cfg.outputs[0].height
+                pixels = max(p.width * p.height for p in port_cfg.outputs)
             elif port_cfg.inputs:
-                pixels = port_cfg.inputs[0].width * port_cfg.inputs[0].height
+                pixels = max(p.width * p.height for p in port_cfg.inputs)
 
         hw_time_ms = calc_processing_time(
             pixels=pixels,
@@ -176,12 +176,13 @@ def run_simulation(
         port_cfg = variant_port_config.get(node_id)
         width, height = 1920, 1080
         if port_cfg:
+            # multi-output IP 대응: 최대 해상도 포트 기준
             if port_cfg.outputs:
-                width = port_cfg.outputs[0].width
-                height = port_cfg.outputs[0].height
+                max_port = max(port_cfg.outputs, key=lambda p: p.width * p.height)
+                width, height = max_port.width, max_port.height
             elif port_cfg.inputs:
-                width = port_cfg.inputs[0].width
-                height = port_cfg.inputs[0].height
+                max_port = max(port_cfg.inputs, key=lambda p: p.width * p.height)
+                width, height = max_port.width, max_port.height
 
         power_mw = calc_active_power(
             unit_power_mw_mp=params.unit_power_mw_mp,

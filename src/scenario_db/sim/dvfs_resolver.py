@@ -231,9 +231,9 @@ class DvfsResolver:
         """port_configs에서 처리 해상도(픽셀) 추출. 없으면 FHD(2073600) 기본값."""
         pc = port_configs.get(node_id)
         if pc:
-            # output port의 첫 번째 항목 해상도 사용
-            for port in pc.outputs:
-                return port.width * port.height
-            for port in pc.inputs:
-                return port.width * port.height
+            # multi-output IP 대응: 최대 해상도 포트 사용 (과소 산정 방지)
+            if pc.outputs:
+                return max(p.width * p.height for p in pc.outputs)
+            if pc.inputs:
+                return max(p.width * p.height for p in pc.inputs)
         return 1920 * 1080   # FHD 기본값
