@@ -168,7 +168,7 @@ Cross-cutting constraints:
 **Plans**: 3 plans
 
 **Wave 1** *(병렬 실행 가능)*
-- [ ] 06-01-PLAN.md — 인프라 + constants + models (config.py DVFS_CONFIG_PATH, dvfs-projectA.yaml, sim/__init__.py, constants.py, models.py, conftest.py, pyproject.toml)
+- [x] 06-01-PLAN.md — 인프라 + constants + models (config.py DVFS_CONFIG_PATH, dvfs-projectA.yaml, sim/__init__.py, constants.py, models.py, conftest.py, pyproject.toml)
 - [ ] 06-02-PLAN.md — 계산 함수 (bw_calc.py, perf_calc.py, power_calc.py) + Golden 값 단위 테스트
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -209,7 +209,7 @@ Cross-cutting constraints:
 | 3. Runtime API | 3/3 | COMPLETE | 2026-05-10 |
 | 4. Level 0 Viewer DB | 3/3 | COMPLETE | 2026-05-10 |
 | 5. Schema Extensions | 3/3 | COMPLETE | 2026-05-10 |
-| 6. sim/ Package | 0/3 | Ready to execute | - |
+| 6. sim/ Package | 1/3 | In Progress | - |
 | 7. Simulation API | 0/3 | Not started | - |
 
 ---
