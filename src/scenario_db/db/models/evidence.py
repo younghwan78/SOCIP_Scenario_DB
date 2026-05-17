@@ -44,6 +44,7 @@ class Evidence(Base):
     provenance          = Column(JSONB)             # meas only
     artifacts           = Column(JSONB)
     yaml_sha256         = Column(Text, nullable=False)
+    params_hash         = Column(Text)               # sim only — Phase 7 추가 (D-02)
     # §22 Generated columns (PostgreSQL ≥12) — ::text 캐스트 + index=True
     sw_version_hint     = Column(
         Text,
