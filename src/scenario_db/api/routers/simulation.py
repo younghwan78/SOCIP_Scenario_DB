@@ -9,6 +9,7 @@
 """
 from __future__ import annotations
 
+import logging
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -32,6 +33,7 @@ from scenario_db.db.repositories.simulation import find_by_params_hash, save_sim
 from scenario_db.models.evidence.simulation import IPTimingResult, PortBWResult
 from scenario_db.sim.runner import run_simulation
 
+logger = logging.getLogger(__name__)
 router = APIRouter(tags=["simulation"])
 
 
@@ -80,17 +82,28 @@ def run_sim(
     sim_config = apply_request_overrides(sim_config, req)
 
     # D-09: 계산 실행
-    result = run_simulation(
-        scenario_id=req.scenario_id,
-        variant_id=req.variant_id,
-        pipeline=pipeline,
-        ip_catalog=ip_catalog,
-        dvfs_tables=dvfs_tables,
-        variant_port_config=variant_port_config,
-        sim_config=sim_config,
-        sensor_spec=sensor_spec,
-        fps=req.fps,
-    )
+    try:
+        result = run_simulation(
+            scenario_id=req.scenario_id,
+            variant_id=req.variant_id,
+            pipeline=pipeline,
+            ip_catalog=ip_catalog,
+            dvfs_tables=dvfs_tables,
+            variant_port_config=variant_port_config,
+            sim_config=sim_config,
+            sensor_spec=sensor_spec,
+            fps=req.fps,
+        )
+    except Exception as exc:
+        logger.exception(
+            "run_simulation failed for scenario=%s variant=%s",
+            req.scenario_id,
+            req.variant_id,
+        )
+        raise HTTPException(
+            status_code=422,
+            detail=f"Simulation failed: {exc}",
+        ) from exc
 
     # D-04: evidence_id 자동 생성
     evidence_id = f"evd-sim-{uuid4().hex[:8]}"
