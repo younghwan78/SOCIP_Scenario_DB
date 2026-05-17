@@ -161,6 +161,11 @@ def get_bw_analysis(
     row = get_evidence(db, evidence_id)
     if row is None:
         raise HTTPException(status_code=404, detail=f"evidence '{evidence_id}' not found")
+    if row.kind != "evidence.simulation":
+        raise HTTPException(
+            status_code=422,
+            detail=f"evidence '{evidence_id}' is kind='{row.kind}', expected 'evidence.simulation'",
+        )
 
     raw_ports: list[dict] = row.dma_breakdown or []
     ports = [PortBWResult.model_validate(p) for p in raw_ports]
@@ -188,6 +193,11 @@ def get_power_analysis(
     row = get_evidence(db, evidence_id)
     if row is None:
         raise HTTPException(status_code=404, detail=f"evidence '{evidence_id}' not found")
+    if row.kind != "evidence.simulation":
+        raise HTTPException(
+            status_code=422,
+            detail=f"evidence '{evidence_id}' is kind='{row.kind}', expected 'evidence.simulation'",
+        )
 
     kpi: dict = row.kpi or {}
     ip_breakdown: dict = row.ip_breakdown or {}
@@ -220,6 +230,11 @@ def get_timing_analysis(
     row = get_evidence(db, evidence_id)
     if row is None:
         raise HTTPException(status_code=404, detail=f"evidence '{evidence_id}' not found")
+    if row.kind != "evidence.simulation":
+        raise HTTPException(
+            status_code=422,
+            detail=f"evidence '{evidence_id}' is kind='{row.kind}', expected 'evidence.simulation'",
+        )
 
     kpi: dict = row.kpi or {}
     raw_timing: list[dict] = row.timing_breakdown or []
