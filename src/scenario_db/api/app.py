@@ -13,6 +13,7 @@ from scenario_db.api.routers import capability, decision, definition, evidence
 from scenario_db.api.routers.utility import health_router
 from scenario_db.api.routers import view as view_router
 from scenario_db.api.routers import runtime as runtime_router
+from scenario_db.api.routers import simulation as simulation_router
 from scenario_db.config import get_settings
 from scenario_db.db.session import make_session_factory
 
@@ -72,6 +73,7 @@ def create_app() -> FastAPI:
         decision.router,
         view_router.router,
         runtime_router.router,
+        simulation_router.router,   # Phase 7 추가 (D-01)
     ]:
         app.include_router(r, prefix="/api/v1")
 
