@@ -158,6 +158,7 @@ def run_simulation(
     # Step 5: Active Power 계산 + VDD 집계
     # ------------------------------------------------------------------
     vdd_power: dict[str, float] = {}
+    ip_power: dict[str, float] = {}          # Phase 7 추가 (D-06)
     total_power_mw: float = 0.0
 
     for node in pipeline.nodes:
@@ -192,6 +193,8 @@ def run_simulation(
         # params.idc 기본값=0.0이므로 IP 정지 전류(leakage) 포함 시 여기에 추가할 것.
         total_power_mw += power_mw
         vdd_power[r.vdd] = vdd_power.get(r.vdd, 0.0) + power_mw
+        ip_name = _resolve_ip_name(node.ip_ref, ip_catalog)
+        ip_power[ip_name] = ip_power.get(ip_name, 0.0) + power_mw  # D-06
 
     # BW 전력 합산
     bw_total_mbs = sum(r.bw_mbs for r in dma_breakdown)
@@ -221,6 +224,7 @@ def run_simulation(
             dma_breakdown=dma_breakdown,
             timing_breakdown=[],
             vdd_power=vdd_power,
+            ip_power=ip_power,
         )
 
     hw_time_max_ms = max((t.hw_time_ms for t in timing_breakdown), default=0.0)
@@ -245,4 +249,5 @@ def run_simulation(
         dma_breakdown=dma_breakdown,
         timing_breakdown=timing_breakdown,
         vdd_power=vdd_power,
+        ip_power=ip_power,
     )

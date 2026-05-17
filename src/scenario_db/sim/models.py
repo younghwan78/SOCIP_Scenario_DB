@@ -70,3 +70,4 @@ class SimRunResult(BaseScenarioModel):
     dma_breakdown: list[PortBWResult] = Field(default_factory=list)
     timing_breakdown: list[IPTimingResult] = Field(default_factory=list)
     vdd_power: dict[str, float] = Field(default_factory=dict)             # VDD domain -> total mW
+    ip_power: dict[str, float] = Field(default_factory=dict)             # Phase 7 추가 (D-06) — ip_name -> active_power_mw
