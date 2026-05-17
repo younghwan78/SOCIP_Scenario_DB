@@ -105,7 +105,7 @@ def test_variant_sim_config_defaults():
     assert cfg.asv_group == 4
     assert cfg.sw_margin == 0.25
     assert cfg.bw_power_coeff == 80.0
-    assert cfg.dvfs_overrides == {}
+    assert cfg.dvfs_overrides is None  # CR-01: dict[str,int]|None=None으로 변경
 
 
 def test_port_input_config_compression_literal():
