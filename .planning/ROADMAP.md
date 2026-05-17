@@ -12,7 +12,7 @@ _Created: 2026-05-05_
 - [x] **Phase 4: Level 0 Viewer DB** — project_level0(db) 구현, topology mode, gate overlay
 - [x] **Phase 5: Schema Extensions** — IpCatalog.sim_params + Variant.sim_port_config/sim_config + Usecase.sensor + SimulationEvidence 확장
 - [x] **Phase 6: sim/ Package** — constants/models/bw_calc/perf_calc/power_calc/dvfs_resolver/adapter/runner
-- [ ] **Phase 7: Simulation API** — /simulation/ 라우터 + params_hash 캐싱
+- [x] **Phase 7: Simulation API** — /simulation/ 라우터 + params_hash 캐싱
 
 ---
 
@@ -198,11 +198,11 @@ Cross-cutting constraints:
 **Plans**: 3 plans
 Plans:
 **Wave 1** *(병렬 실행 가능)*
-- [ ] 07-01-PLAN.md — 인프라 + 스키마 (migration 0003, Pydantic 스키마 5종, simulation repository)
-- [ ] 07-02-PLAN.md — runner 확장 + ORM 변환 (SimRunResult.ip_power, loaders.py)
+- [x] 07-01-PLAN.md — 인프라 + 스키마 (migration 0003, Pydantic 스키마 5종, simulation repository)
+- [x] 07-02-PLAN.md — runner 확장 + ORM 변환 (SimRunResult.ip_power, loaders.py)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 07-03-PLAN.md — FastAPI 라우터 5개 엔드포인트 + 통합 테스트
+- [x] 07-03-PLAN.md — FastAPI 라우터 5개 엔드포인트 + 통합 테스트
 **UI hint**: no
 
 ---
@@ -217,7 +217,7 @@ Plans:
 | 4. Level 0 Viewer DB | 3/3 | COMPLETE | 2026-05-10 |
 | 5. Schema Extensions | 3/3 | COMPLETE | 2026-05-10 |
 | 6. sim/ Package | 3/3 | COMPLETE | 2026-05-16 |
-| 7. Simulation API | 0/3 | Planned | - |
+| 7. Simulation API | 3/3 | COMPLETE | 2026-05-17 |
 
 ---
 
