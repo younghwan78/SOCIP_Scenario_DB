@@ -42,8 +42,14 @@ def _load_dvfs_tables() -> dict[str, DVFSTable]:
                   voltages: {0: 820, 4: 780, 8: 750}
                 ...
     """
-    with open(DVFS_CONFIG_PATH, encoding="utf-8") as f:
-        raw = yaml.safe_load(f)
+    try:
+        with open(DVFS_CONFIG_PATH, encoding="utf-8") as f:
+            raw = yaml.safe_load(f)
+    except FileNotFoundError as e:
+        raise RuntimeError(
+            f"DVFS config not found: {DVFS_CONFIG_PATH}. "
+            f"Set DVFS_CONFIG_PATH env or verify hw_config/ directory."
+        ) from e
 
     tables: dict[str, DVFSTable] = {}
     for domain, level_list in raw.get("dvfs_tables", {}).items():
