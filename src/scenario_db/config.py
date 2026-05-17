@@ -30,4 +30,4 @@ def get_settings() -> Settings:
 
 
 # DVFS 설정 파일 경로 — production 로드 경로. 테스트는 dvfs_tables dict 직접 주입.
-DVFS_CONFIG_PATH: Path = Path("hw_config/dvfs-projectA.yaml")
+DVFS_CONFIG_PATH: Path = Path(__file__).parent.parent.parent / "hw_config" / "dvfs-projectA.yaml"
