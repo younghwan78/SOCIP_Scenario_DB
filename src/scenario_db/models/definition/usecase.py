@@ -181,7 +181,7 @@ class SimGlobalConfig(BaseScenarioModel):
     vbat: float = 4.0
     pmic_eff: float = 0.85
     h_blank_margin: float = 0.05
-    dvfs_overrides: dict[str, int] = Field(default_factory=dict)
+    dvfs_overrides: dict[str, int] | None = None
 
 
 # ---------------------------------------------------------------------------

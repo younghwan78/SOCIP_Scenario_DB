@@ -64,7 +64,7 @@ def run_simulation(
         fps=effective_fps,
         sw_margin=sim_config.sw_margin,
         sensor_spec=sensor_spec,
-        dvfs_overrides=sim_config.dvfs_overrides or None,
+        dvfs_overrides=sim_config.dvfs_overrides,
     )
 
     # ------------------------------------------------------------------
