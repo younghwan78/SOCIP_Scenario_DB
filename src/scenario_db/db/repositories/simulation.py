@@ -38,7 +38,7 @@ def save_sim_evidence(
             "total_power_ma": result.total_power_ma,
             "bw_total_mbs": result.bw_total_mbs,
             "hw_time_max_ms": result.hw_time_max_ms,
-            "feasible": int(result.feasible),
+            "feasible": result.feasible,  # bool — JSONB에 boolean으로 저장
         },
         run_info={
             "timestamp": datetime.now(tz=timezone.utc).isoformat(),

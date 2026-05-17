@@ -60,7 +60,7 @@ def run_sim(
             evidence_id=cached_row.id,
             params_hash=params_hash,
             cached=True,
-            feasible=bool(kpi.get("feasible", 0)),
+            feasible=bool(kpi.get("feasible", False)),
             total_power_mw=float(kpi.get("total_power_mw", 0.0)),
             bw_total_mbs=float(kpi.get("bw_total_mbs", 0.0)),
             hw_time_max_ms=float(kpi.get("hw_time_max_ms", 0.0)),
@@ -217,7 +217,7 @@ def get_timing_analysis(
 
     return TimingAnalysisResponse(
         evidence_id=evidence_id,
-        feasible=bool(kpi.get("feasible", 0)),
+        feasible=bool(kpi.get("feasible", False)),
         hw_time_max_ms=float(kpi.get("hw_time_max_ms", 0.0)),
         critical_ip=critical_ip,
         per_ip=timing_sorted,
