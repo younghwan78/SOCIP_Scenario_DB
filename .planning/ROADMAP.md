@@ -1,4 +1,4 @@
-# Roadmap — ScenarioDB Viewer MVP & Simulation Engine
+﻿# Roadmap — ScenarioDB Viewer MVP & Simulation Engine
 
 _Created: 2026-05-05_
 
@@ -195,7 +195,14 @@ Cross-cutting constraints:
   3. `GET /simulation/bw-analysis` 가 PortBWResult 목록을 bw_mbs 내림차순으로 반환하고, `GET /simulation/power-analysis` 가 total_power/per_ip/per_vdd/bw_power를 반환한다
   4. `GET /simulation/timing-analysis` 가 critical_ip/hw_time_max_ms/per_ip/feasible을 반환한다
   5. 동일 SHA256 params_hash로 두 번 요청하면 재계산 없이 캐시된 evidence_id를 즉시 반환한다
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1** *(병렬 실행 가능)*
+- [ ] 07-01-PLAN.md — 인프라 + 스키마 (migration 0003, Pydantic 스키마 5종, simulation repository)
+- [ ] 07-02-PLAN.md — runner 확장 + ORM 변환 (SimRunResult.ip_power, loaders.py)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 07-03-PLAN.md — FastAPI 라우터 5개 엔드포인트 + 통합 테스트
 **UI hint**: no
 
 ---
@@ -210,7 +217,7 @@ Cross-cutting constraints:
 | 4. Level 0 Viewer DB | 3/3 | COMPLETE | 2026-05-10 |
 | 5. Schema Extensions | 3/3 | COMPLETE | 2026-05-10 |
 | 6. sim/ Package | 3/3 | COMPLETE | 2026-05-16 |
-| 7. Simulation API | 0/3 | Not started | - |
+| 7. Simulation API | 0/3 | Planned | - |
 
 ---
 
