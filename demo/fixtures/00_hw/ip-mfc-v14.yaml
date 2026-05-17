@@ -21,3 +21,19 @@ capabilities:
     bitdepth: [8, 10]
     hdr_formats: [HDR10, HDR10plus]
     compression: [AFBC_v2]
+
+sim_params:
+  hw_name_in_sim: "MFC"
+  ppc: 1.0
+  unit_power_mw_mp: 5.0
+  idc: 0.3
+  vdd: "VDD_MFC"
+  dvfs_group: "INT"
+  latency_us: 0.0
+  ports:
+    - name: "RDMA"
+      type: "DMA_READ"
+      max_bw_gbps: 12.8
+    - name: "WDMA"
+      type: "DMA_WRITE"
+      max_bw_gbps: 6.4

@@ -29,6 +29,13 @@ pipeline:
     - { layer: hal,       id: hal-disp,     label: "Display HAL" }
     - { layer: kernel,    id: ker-drm,      label: "DRM/KMS",      ip_ref: dpu }
 
+sensor:
+  ip_ref: ip-csis-v8
+  frame_width: 4000
+  frame_height: 3000
+  fps: 60.0
+  v_valid_ratio: 0.85
+
 size_profile:
   anchors:
     sensor_full: "4000x3000"
@@ -55,6 +62,47 @@ variants:
     size_overrides:
       record_out:  "3840x2160"
       preview_out: "1920x1080"
+
+    sim_port_config:
+      isp0:
+        mode: Normal
+        inputs:
+          - port: RDMA_FE
+            format: RAW10
+            width: 3840
+            height: 2160
+            compression: disable
+            llc_weight: 0.6
+        outputs:
+          - port: WDMA_BE
+            format: NV12
+            width: 3840
+            height: 2160
+            compression: disable
+            llc_weight: 0.4
+      mfc:
+        mode: Normal
+        inputs:
+          - port: RDMA
+            format: NV12
+            width: 3840
+            height: 2160
+            compression: disable
+            llc_weight: 0.5
+        outputs:
+          - port: WDMA
+            format: H265
+            width: 3840
+            height: 2160
+            compression: disable
+            llc_weight: 0.0
+
+    sim_config:
+      asv_group: 4
+      sw_margin: 0.0
+      bw_power_coeff: 1.5
+      vbat: 3700
+      pmic_eff: 0.85
 
     ip_requirements:
       isp0:

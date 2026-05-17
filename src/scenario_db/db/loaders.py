@@ -153,7 +153,17 @@ def load_runner_inputs_from_db(
         .all()
     )
     ip_catalog: dict[str, IpCatalog] = {
-        row.id: IpCatalog.model_validate(row, from_attributes=True)
+        row.id: IpCatalog.model_validate({
+            "kind": "ip",
+            "id": row.id,
+            "schema_version": row.schema_version,
+            "category": row.category,
+            "hierarchy": row.hierarchy,
+            "capabilities": row.capabilities,
+            "rtl_version": row.rtl_version,
+            "compatible_soc": row.compatible_soc or [],
+            "sim_params": row.sim_params,
+        })
         for row in catalog_rows
     }
 

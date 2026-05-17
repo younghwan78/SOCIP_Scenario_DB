@@ -31,3 +31,23 @@ capabilities:
     bitdepth: [8, 10, 12]
     hdr_formats: [HDR10, HDR10plus, DolbyVision]
     compression: [SBWC_v4, AFBC_v2]
+
+sim_params:
+  hw_name_in_sim: "ISP"
+  ppc: 4.0
+  unit_power_mw_mp: 10.5
+  idc: 0.5
+  vdd: "VDD_INTCAM"
+  dvfs_group: "CAM"
+  latency_us: 0.0
+  ports:
+    - name: "RDMA_FE"
+      type: "DMA_READ"
+      max_bw_gbps: 25.6
+    - name: "WDMA_BE"
+      type: "DMA_WRITE"
+      max_bw_gbps: 12.8
+    - name: "CINFIFO"
+      type: "OTF_IN"
+    - name: "COUTFIFO"
+      type: "OTF_OUT"
