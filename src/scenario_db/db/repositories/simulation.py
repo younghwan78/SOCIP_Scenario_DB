@@ -1,7 +1,7 @@
 """Simulation Evidence DB 저장/조회 (D-08, D-02, SAPI-06)."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
@@ -41,7 +41,7 @@ def save_sim_evidence(
             "feasible": int(result.feasible),
         },
         run_info={
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(tz=timezone.utc).isoformat(),
             "tool": "scenario_db.sim.runner",
             "source": "simulated",
         },
